@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' file:; style-src 'self' file:; img-src 'self' file: data: blob:; font-src 'self' file:; connect-src 'none'; manifest-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-g4y5hjiPkMF875zIWQkfSDegfrwlVhHp/G3r5gX+nCM='; style-src 'sha256-H+c7lkCGeocj+EBAtKJrhsNAoC+y5LlASU/UL9bmKDs='; img-src 'self' data: blob:; font-src 'self'; connect-src 'none'; manifest-src 'self' data:; worker-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-src 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="theme-color" content="#2563eb">
 <meta name="color-scheme" content="light">
@@ -14,7 +14,373 @@
 <title>商机管家</title>
 <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
 <link rel="apple-touch-icon" sizes="180x180" href="icons/icon-180.png">
-<link rel="stylesheet" href="style.css">
+<style>
+/* =====================================================
+   商机管家 v3.0 · 移动优先样式
+   ===================================================== */
+:root{
+  --bg:#f2f4f8; --card:#ffffff; --line:#e5e8ef;
+  --text:#1a2333; --text2:#667085; --text3:#98a2b3;
+  --primary:#2563eb; --primary-weak:#e8effe;
+  --red:#dc2626; --orange:#ea580c; --green:#16a34a;
+  --radius:14px; --shadow:0 1px 3px rgba(16,24,40,.06);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  background:var(--bg);color:var(--text);font-size:15px;line-height:1.5;
+}
+button{font-family:inherit;color:inherit}
+input,select,textarea{font-family:inherit}
+.muted{color:var(--text3);font-weight:400;font-size:12px}
+.small{font-size:12px}
+em{font-style:normal}
+[hidden]{display:none !important}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.skip-link{position:fixed;left:12px;top:-60px;z-index:500;background:var(--primary);color:#fff;padding:10px 16px;border-radius:10px;text-decoration:none;font-weight:700;transition:top .15s}
+.skip-link:focus{top:12px}
+:focus-visible{outline:3px solid rgba(37,99,235,.45);outline-offset:2px}
+body.modal-open,body.sheet-open{overflow:hidden}
+
+/* ---------- 错误提示条 ---------- */
+.js-error{background:#fdeaea;color:#b42318;padding:10px 16px;font-size:13px;font-weight:600;border-bottom:1px solid #fecaca;word-break:break-word;z-index:999;position:relative;display:flex;gap:12px;align-items:flex-start}
+.js-error-close{margin-left:auto;background:none;border:none;font-size:20px;line-height:1;color:#b42318;cursor:pointer;padding:0 4px}
+
+/* ---------- 顶部栏 ---------- */
+.app-header{position:sticky;top:0;z-index:40;background:rgba(242,244,248,.92);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.header-inner{max-width:640px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+#pageTitle{font-size:18px;margin:0;font-weight:700}
+.save-state{font-size:11px;color:var(--text3);white-space:nowrap;font-weight:500}
+.save-state.ok{color:var(--green)}
+.save-state.bad{color:var(--red);font-weight:700}
+
+/* ---------- 主区域 ---------- */
+.main{max-width:640px;margin:0 auto;padding:12px 12px 150px;padding:12px 12px calc(150px + env(safe-area-inset-bottom))}
+.page{animation:fadeIn .18s ease}
+.no-anim .page,.no-anim .modal,.no-anim .sheet{animation:none}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+
+/* ---------- 全局状态条 ---------- */
+.global-banner{margin-bottom:12px}
+.global-banner-inner{border-radius:12px;padding:11px 14px;font-size:13px;line-height:1.6;border:1px solid transparent}
+.banner-red{background:#fdeaea;color:#9f1d1d;border-color:#fecaca}
+.banner-orange{background:#fff7e6;color:#9a4d00;border-color:#ffe1a8}
+.banner-blue{background:var(--primary-weak);color:#1d4ed8;border-color:#cdddfb}
+.banner-text{word-break:break-word}
+.banner-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.banner-btn{border:1px solid currentColor;background:transparent;color:inherit;border-radius:8px;padding:5px 10px;font-size:12px;font-weight:700;cursor:pointer}
+.banner-btn:active{opacity:.75}
+
+/* ---------- 底部导航 ---------- */
+.tabbar{position:fixed;bottom:0;left:0;right:0;z-index:40;background:#fff;border-top:1px solid var(--line);padding-bottom:0;padding-bottom:env(safe-area-inset-bottom);display:flex;justify-content:center}
+.tabbar-inner{width:100%;max-width:640px;display:flex}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:7px 0 5px;background:none;border:none;color:#98a2b3;font-size:11px;cursor:pointer}
+.tab svg{width:22px;height:22px}
+.tab.active{color:var(--primary);font-weight:600}
+
+/* ---------- 悬浮按钮 ---------- */
+.fab{position:fixed;bottom:76px;bottom:calc(env(safe-area-inset-bottom) + 76px);right:max(20px,calc((100vw - 640px)/2 + 20px));width:56px;height:56px;border-radius:50%;background:var(--primary);color:#fff;border:none;box-shadow:0 6px 18px rgba(37,99,235,.42);display:flex;align-items:center;justify-content:center;z-index:45;cursor:pointer;transition:transform .15s}
+.fab:active{transform:scale(.93)}
+.fab svg{width:26px;height:26px}
+
+/* ---------- 卡片 ---------- */
+.card{background:var(--card);border-radius:var(--radius);padding:14px;margin-bottom:12px;box-shadow:var(--shadow)}
+.card-title{font-size:15px;font-weight:700;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.card-sub{font-size:12px;color:var(--text3);font-weight:600;margin:8px 0 2px}
+.title-tag{margin-left:8px;vertical-align:1px}
+.pad-top{margin-top:8px}
+.hint{font-size:12px;color:var(--text3);line-height:1.6;margin:8px 0 0}
+.link-btn{background:none;border:none;color:var(--primary);font-size:12px;font-weight:600;cursor:pointer;padding:2px 0}
+
+/* ---------- 首页统计 ---------- */
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.stat{background:var(--card);border-radius:var(--radius);padding:13px 14px;box-shadow:var(--shadow);border-top:3px solid transparent}
+.stat-v{font-size:21px;font-weight:800;line-height:1.2;word-break:break-all;color:var(--text)}
+.stat-l{font-size:12px;color:var(--text2);margin-top:2px}
+.stat-s{font-size:11px;color:var(--text3);margin-top:2px}
+.stat-green{border-top-color:var(--green)} .stat-green .stat-v{color:var(--green)}
+.stat-violet{border-top-color:#7c3aed} .stat-violet .stat-v{color:#7c3aed}
+.stat-blue{border-top-color:var(--primary)} .stat-blue .stat-v{color:var(--primary)}
+.stat-orange{border-top-color:var(--orange)} .stat-orange .stat-v{color:var(--orange)}
+
+.quick-actions{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px}
+.qa{display:flex;flex-direction:column;align-items:center;gap:2px;padding:14px 8px;border-radius:var(--radius);border:none;font-size:13px;font-weight:600;cursor:pointer;background:#fff;box-shadow:var(--shadow)}
+.qa:active{transform:scale(.97)}
+.qa-ico{font-size:22px}
+.qa-blue{background:var(--primary-weak);color:var(--primary)}
+.qa-violet{background:#f0e9fd;color:#7c3aed}
+.qa-green{background:#e7f6ec;color:#16a34a}
+
+/* 三张表快捷入口 */
+.table-shortcuts{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px}
+.table-shortcut{display:flex;flex-direction:column;align-items:center;gap:1px;padding:10px 6px;border-radius:12px;border:1px solid var(--line);background:#fff;cursor:pointer;box-shadow:var(--shadow)}
+.table-shortcut b{font-size:18px;color:var(--text)}
+.table-shortcut span{font-size:12px;color:var(--text2)}
+.table-shortcut:active{background:#fafbfc}
+
+/* ---------- 阶段颜色 ---------- */
+.st-lead{--st:#64748b;--stw:#eef1f5}
+.st-need{--st:#0284c7;--stw:#e3f3fc}
+.st-intent{--st:#0d9488;--stw:#e2f5f2}
+.st-plan{--st:#7c3aed;--stw:#f0e9fd}
+.st-quote{--st:#ea580c;--stw:#fef0e5}
+.st-bid{--st:#dc2626;--stw:#fdeaea}
+.st-deal{--st:#16a34a;--stw:#e7f6ec}
+.st-lost{--st:#9ca3af;--stw:#f2f3f5}
+.st-badge{background:var(--stw);color:var(--st);font-size:12px;padding:2px 8px;border-radius:6px;font-weight:600;white-space:nowrap}
+
+/* ---------- 标签 ---------- */
+.tag{display:inline-block;font-size:11px;padding:2px 8px;border-radius:999px;font-weight:600;white-space:nowrap}
+.tag-red{background:#fdeaea;color:#dc2626}
+.tag-orange{background:#fef0e5;color:#ea580c}
+.tag-green{background:#e7f6ec;color:#16a34a}
+.tag-blue{background:#e8effe;color:#2563eb}
+.tag-slate{background:#eef1f5;color:#64748b}
+
+/* ---------- 按钮 ---------- */
+.btn{padding:10px 16px;border-radius:10px;font-size:15px;border:1px solid var(--line);background:#fff;font-weight:600;cursor:pointer;text-align:center}
+.btn:active{opacity:.85}
+.btn:disabled{opacity:.55;cursor:not-allowed}
+.btn.primary{background:var(--primary);border-color:var(--primary);color:#fff}
+.btn.ghost{background:transparent}
+.btn.danger{background:var(--red);border-color:var(--red);color:#fff}
+.btn.danger-text{color:var(--red);border-color:#fecaca}
+.mini-btn{padding:6px 12px;border-radius:8px;border:1px solid var(--line);background:#fff;color:var(--text);font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap}
+.mini-btn:active{opacity:.8}
+.mini-btn.primary{background:var(--primary);border-color:var(--primary);color:#fff}
+.mini-btn.ghost{background:transparent}
+
+/* ---------- 列表项 ---------- */
+.item{background:var(--card);border-radius:var(--radius);padding:13px;margin-bottom:10px;box-shadow:var(--shadow);cursor:pointer}
+.item:active{background:#fafbfc}
+
+.cust-top{display:flex;gap:10px;align-items:center}
+.avatar{width:40px;height:40px;border-radius:50%;background:var(--primary-weak);color:var(--primary);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;flex:none}
+.avatar.big{width:50px;height:50px;font-size:20px}
+.cust-info{min-width:0;flex:1}
+.cust-name{font-weight:700;font-size:15px}
+.cust-sub{font-size:12px;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cust-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px}
+.cust-arrow{margin-left:auto;color:#c2c8d2;font-size:20px;flex:none}
+.code-tag{display:inline-block;margin-left:6px;font-size:10px;color:#8a94a6;background:#f2f4f8;border-radius:4px;padding:1px 5px;vertical-align:2px;font-weight:500}
+.lvl{display:inline-block;margin-left:6px;font-size:11px;font-weight:700;padding:1px 6px;border-radius:5px;vertical-align:2px}
+.lvl-A{background:#fdeaea;color:#dc2626}
+.lvl-B{background:#e8effe;color:#2563eb}
+.lvl-C{background:#eef1f5;color:#64748b}
+.lvl-D{background:#f3f0e8;color:#8a6d1d}
+
+/* ---------- 商机 ---------- */
+.opp-top{display:flex;gap:8px;align-items:center;margin-bottom:5px}
+.opp-name{font-weight:700;font-size:15px;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.opp-cust{font-size:12px;color:var(--text2);margin-bottom:7px}
+.opp-meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:9px}
+.opp-amt{font-weight:800;font-size:16px;color:#1d4ed8}
+.opp-foot{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.opp-btns{display:flex;gap:6px}
+
+/* ---------- 跟进记录 ---------- */
+.rec-head{display:flex;align-items:center;gap:8px;margin-bottom:5px}
+.type-badge{display:inline-block;background:#eef1f5;color:#475467;font-size:12px;padding:2px 8px;border-radius:6px;font-weight:600;flex:none}
+.rec-cust{font-weight:700;font-size:14px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rec-cust em{color:var(--text3);font-weight:400;font-size:12px}
+.rec-content{font-size:13px;color:#344054;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin-bottom:7px;word-break:break-word}
+.rec-foot{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.tl-item{position:relative;margin-left:6px;padding-left:14px;border-left:2px solid var(--line);margin-bottom:10px}
+.tl-item .tl-dot{position:absolute;left:-6px;top:14px;width:10px;height:10px;border-radius:50%;background:var(--primary);border:2px solid #fff}
+.rec-time{font-size:11px;margin-top:2px}
+.rec-sub{font-size:12px;color:#475467;background:#f7f8fa;border-radius:8px;padding:6px 8px;margin-top:6px;line-height:1.5}
+
+/* ---------- 搜索与筛选 ---------- */
+.searchbar{margin-bottom:10px}
+.search{width:100%;padding:10px 14px;border-radius:12px;border:1px solid var(--line);background:#fff;font-size:16px;color:var(--text);outline:none;-webkit-appearance:none}
+.search:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(37,99,235,.12)}
+.chips{display:flex;gap:8px;overflow-x:auto;padding:2px 2px 10px;scrollbar-width:none;margin-bottom:2px}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;padding:6px 12px;border-radius:999px;border:1px solid var(--line);background:#fff;color:var(--text2);font-size:13px;cursor:pointer;display:flex;gap:6px;align-items:center}
+.chip i{font-style:normal;font-size:11px;background:#eef1f5;color:#667085;border-radius:999px;padding:0 6px;line-height:16px}
+.chip.active{background:var(--primary);border-color:var(--primary);color:#fff}
+.chip.active i{background:rgba(255,255,255,.28);color:#fff}
+
+/* ---------- 空状态 ---------- */
+.empty{padding:36px 12px;text-align:center;color:var(--text3);font-size:14px}
+
+/* ---------- 视图切换 ---------- */
+.viewbar{display:flex;gap:8px;margin-bottom:10px}
+.viewbtn{flex:1;padding:8px 0;border-radius:10px;border:1px solid var(--line);background:#fff;color:var(--text2);font-size:14px;font-weight:600;cursor:pointer}
+.viewbtn.on{background:var(--primary);border-color:var(--primary);color:#fff}
+
+/* ---------- 表格视图 ---------- */
+.table-hint{font-size:11px;color:var(--text3);text-align:right;margin:0 2px 6px}
+.table-wrap{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);overflow:auto;max-height:72vh;-webkit-overflow-scrolling:touch;margin-bottom:12px}
+.data-table{width:100%;min-width:780px;border-collapse:separate;border-spacing:0;font-size:12.5px}
+.data-table caption{text-align:left}
+.data-table th{position:sticky;top:0;z-index:2;background:#f8fafc;color:#475467;font-weight:700;text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);white-space:nowrap}
+.data-table td{padding:10px 12px;border-bottom:1px solid #f1f3f7;vertical-align:middle;color:#344054}
+.data-table tr:last-child td{border-bottom:none}
+.data-table tbody tr{cursor:pointer}
+.data-table tbody tr:nth-child(even){background:#fcfdff}
+.data-table tbody tr:hover,.data-table tbody tr:focus{background:#f5f8ff;outline:none}
+.data-table th:first-child,.data-table td:first-child{position:sticky;left:0;z-index:1;background:#fff;box-shadow:1px 0 0 var(--line)}
+.data-table th:first-child{background:#f8fafc;z-index:3}
+.data-table tbody tr:nth-child(even) td:first-child{background:#fcfdff}
+.data-table tbody tr:hover td:first-child,.data-table tbody tr:focus td:first-child{background:#f5f8ff}
+.data-table .num{text-align:right;font-variant-numeric:tabular-nums;font-weight:700;color:#1d4ed8}
+.data-table .nowrap{white-space:nowrap}
+.data-table .cell-wide{min-width:260px;max-width:420px;word-break:break-word}
+@media (min-width:760px){.table-hint{display:none}}
+
+/* ---------- 看板 ---------- */
+.kanban{display:flex;gap:10px;overflow-x:auto;padding:2px 2px 14px;scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch}
+.kanban-col{flex:0 0 76vw;max-width:290px;background:#eaeef5;border-radius:14px;padding:8px;scroll-snap-align:start;display:flex;flex-direction:column;max-height:62vh;transition:background .15s}
+.kanban-col.over{background:#e3edff;outline:2px dashed var(--primary);outline-offset:-2px}
+.kanban-head{display:flex;align-items:center;justify-content:space-between;padding:2px 6px 8px;font-size:13px}
+.kanban-title{font-weight:700;color:var(--st)}
+.kanban-head b{font-size:12px;color:var(--text3);background:#fff;border-radius:999px;padding:0 7px;line-height:18px}
+.kanban-body{overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:8px;padding-bottom:4px}
+.kanban-card{background:#fff;border-radius:12px;padding:9px 10px;box-shadow:var(--shadow);font-size:13px;cursor:pointer}
+.kanban-card:active{opacity:.9}
+.kanban-card-top{display:flex;gap:6px;align-items:flex-start}
+.drag-grip{flex:none;color:#98a2b3;font-size:16px;line-height:18px;cursor:grab;touch-action:none;user-select:none;padding:0 2px}
+.kanban-card-name{font-weight:700;font-size:13px;line-height:1.35;word-break:break-word}
+.kanban-card-cust{font-size:12px;color:var(--text2);margin-top:3px}
+.kanban-card-meta{display:flex;align-items:center;gap:6px;margin-top:5px}
+.kanban-amt{font-weight:800;color:#1d4ed8;font-size:14px}
+.kanban-date{font-size:11px;color:var(--text3);margin-top:3px}
+.kanban-empty{border:1.5px dashed #cfd6e2;border-radius:10px;color:#a8b1c0;font-size:12px;text-align:center;padding:14px 6px}
+.kanban-card.ghost{position:fixed;z-index:300;pointer-events:none;box-shadow:0 12px 30px rgba(15,23,42,.28);transform:rotate(2deg);opacity:.96;background:#fff}
+.kanban-card.dragging-src{opacity:.35}
+body.dragging{user-select:none;-webkit-user-select:none;overflow:hidden}
+
+/* ---------- 提醒 ---------- */
+.remind-row{display:flex;align-items:center;gap:8px;padding:9px 0;border-bottom:1px solid #f2f4f8;flex-wrap:wrap}
+.remind-row:last-child{border-bottom:none}
+.remind-main{flex:1;min-width:180px}
+.remind-text{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mini-follow{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid #f2f4f8;font-size:13px;cursor:pointer;background:none;border-left:none;border-right:none;border-top:none;width:100%;text-align:left}
+.mini-follow:last-child{border-bottom:none}
+.mini-follow-text{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* ---------- 照片 ---------- */
+.photo-grid{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+.photo-thumb-btn{padding:0;border:none;background:none;cursor:pointer;border-radius:8px}
+.photo-thumb{width:64px;height:64px;border-radius:8px;object-fit:cover;border:1px solid var(--line);display:block;cursor:pointer}
+.photo-thumb.missing{display:flex;align-items:center;justify-content:center;background:#f2f4f8;color:var(--text3);font-size:11px;cursor:default}
+.photo-more{display:flex;align-items:center;justify-content:center;width:48px;height:64px;color:var(--text2);font-size:12px;font-weight:700;background:#f2f4f8;border:1px dashed var(--line);border-radius:8px;cursor:pointer}
+.photo-item{position:relative;width:72px;height:72px}
+.photo-item img{width:72px;height:72px;border-radius:8px;object-fit:cover;border:1px solid var(--line)}
+.photo-missing{display:flex;align-items:center;justify-content:center;width:72px;height:72px;border-radius:8px;background:#f2f4f8;color:var(--text3);font-size:11px;border:1px dashed var(--line)}
+.photo-del{position:absolute;top:-6px;right:-6px;width:22px;height:22px;border-radius:50%;background:rgba(17,24,39,.82);color:#fff;font-size:14px;line-height:20px;text-align:center;cursor:pointer;font-weight:400;border:2px solid #fff;padding:0}
+.full-img{width:100%;border-radius:12px;display:block;margin-bottom:10px;background:#f2f4f8}
+.photo-status{font-size:12px;margin-top:8px;color:var(--text2)}
+.photo-status.warn{color:var(--orange)}
+.file-input{margin-top:8px;font-size:14px;border:none;padding:0;max-width:100%}
+.pv-nav{display:flex;gap:10px;margin-bottom:10px}
+.pv-nav .btn{flex:1}
+.pv-thumbs{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px;margin-bottom:10px}
+.pv-thumb{flex:none;width:54px;height:54px;border-radius:8px;border:2px solid transparent;padding:0;overflow:hidden;background:#f2f4f8;cursor:pointer}
+.pv-thumb.on{border-color:var(--primary)}
+.pv-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.pv-thumb span{font-size:10px;color:var(--text3)}
+
+/* ---------- 底部抽屉（客户详情） ---------- */
+.backdrop{position:fixed;inset:0;background:rgba(15,23,42,.45);z-index:50;animation:fadeIn .18s ease}
+.sheet{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:100%;max-width:640px;max-height:88vh;max-height:88dvh;background:#fff;border-radius:20px 20px 0 0;z-index:60;overflow-y:auto;padding:6px 16px 20px;padding:6px 16px calc(20px + env(safe-area-inset-bottom));animation:slideUp .22s ease}
+.sheet-handle{width:40px;height:4px;border-radius:999px;background:#d9dde5;margin:6px auto 10px}
+@keyframes slideUp{from{transform:translateX(-50%) translateY(60px);opacity:.5}to{transform:translateX(-50%) translateY(0);opacity:1}}
+.sheet-close{position:sticky;top:2px;float:right;z-index:2;width:34px;height:34px;border-radius:50%;border:none;background:#f2f4f8;color:var(--text2);font-size:20px;line-height:1;cursor:pointer}
+.sheet-head{display:flex;gap:12px;align-items:center;margin:4px 0 10px}
+.sheet-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:14px 0}
+.info-row{display:flex;align-items:center;gap:8px;padding:9px 0;border-bottom:1px solid #f2f4f8;font-size:14px;text-decoration:none;color:var(--text);word-break:break-word}
+.info-row span{flex:none}
+.info-row em{margin-left:auto;color:var(--primary);font-weight:600;font-size:13px}
+.mini-opp{display:flex;align-items:center;gap:8px;width:100%;background:none;border:none;border-bottom:1px solid #f2f4f8;padding:9px 0;cursor:pointer;text-align:left;font-size:14px}
+.mini-opp:last-child{border-bottom:none}
+.mini-opp-name{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:600}
+.mini-opp b{font-size:13px;color:#1d4ed8}
+.mini-rec{width:100%;background:none;border:none;border-bottom:1px solid #f2f4f8;padding:9px 0;cursor:pointer;text-align:left}
+.mini-rec:last-child{border-bottom:none}
+.mini-rec-top{display:flex;align-items:center;gap:8px;margin-bottom:3px;flex-wrap:wrap}
+.mini-rec-content{font-size:13px;color:#344054;text-align:left}
+
+/* ---------- 弹窗 ---------- */
+.modal-wrap{position:fixed;inset:0;z-index:70;display:flex;align-items:flex-end;justify-content:center}
+.modal{position:relative;background:#fff;width:100%;max-width:640px;max-height:90vh;max-height:90dvh;overflow-y:auto;border-radius:20px 20px 0 0;padding:16px 16px 20px;padding:16px 16px calc(20px + env(safe-area-inset-bottom));animation:slideUp .22s ease}
+.modal-x{position:sticky;top:0;float:right;z-index:3;width:34px;height:34px;border-radius:50%;border:none;background:#f2f4f8;color:var(--text2);font-size:20px;line-height:1;cursor:pointer;margin:-4px -4px 0 8px}
+.modal-head{font-weight:700;font-size:17px;margin-bottom:14px;padding-right:38px}
+.modal-sub{font-size:12px;color:var(--text3);margin:-8px 0 12px;line-height:1.6}
+.modal-actions{margin:0 0 10px}
+.confirm-msg{font-size:14px;color:#344054;line-height:1.7;margin-bottom:16px;word-break:break-word;white-space:pre-line}
+.form-btns{display:flex;gap:10px;margin-top:16px}
+.form-btns .btn{flex:1}
+.form-btns .spacer{flex:2}
+.form-btns .btn.danger-text{flex:1.4}
+.form-stack{display:flex;flex-direction:column;gap:10px}
+
+/* ---------- 表单 ---------- */
+.field{margin-bottom:13px}
+.field-top{margin-top:12px}
+.field>label{display:block;font-size:13px;color:var(--text2);margin-bottom:6px;font-weight:600}
+.field input,.field select,.field textarea{width:100%;border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:16px;background:#fff;color:var(--text);outline:none;-webkit-appearance:none}
+.field textarea{resize:vertical;font-size:15px}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(37,99,235,.12)}
+.req{color:var(--red);font-style:normal;margin-left:2px}
+.seg{display:flex;flex-wrap:wrap;gap:8px}
+.seg-btn{padding:8px 14px;border-radius:999px;border:1px solid var(--line);background:#fff;color:var(--text2);font-size:13px;font-weight:600;cursor:pointer}
+.seg-btn.on{background:var(--primary);border-color:var(--primary);color:#fff}
+.stage-chips{display:flex;flex-wrap:wrap;gap:8px}
+.st-chip{padding:7px 13px;border-radius:999px;border:1px solid var(--line);background:#fff;color:var(--text2);font-size:13px;font-weight:600;cursor:pointer}
+.st-chip.on{background:var(--stw);color:var(--st);border-color:var(--st)}
+.quick-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+
+/* ---------- 时间线（阶段历史） ---------- */
+.timeline{margin-top:4px}
+.history-card{box-shadow:none;border:1px solid var(--line)}
+.history-card .tl-item{border-left-color:var(--line);padding-bottom:6px}
+
+/* ---------- 我的 ---------- */
+.kv{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid #f2f4f8;font-size:14px}
+.kv:last-child{border-bottom:none}
+.kv b{font-size:14px;text-align:right}
+.row-btn{display:flex;align-items:center;gap:10px;width:100%;background:none;border:none;border-bottom:1px solid #f2f4f8;padding:13px 2px;font-size:15px;cursor:pointer;text-align:left}
+.row-btn:last-child{border-bottom:none}
+.row-btn:active{opacity:.7}
+.row-btn span{flex:none}
+.row-btn em{margin-left:auto;color:var(--text3)}
+.row-btn.danger{color:var(--red)}
+.help{margin-bottom:8px;font-size:14px}
+.help summary{cursor:pointer;font-weight:600;color:var(--text);padding:4px 0}
+.help-body{padding:6px 0 6px 12px;color:var(--text2);font-size:13px;line-height:1.7;border-left:3px solid var(--primary-weak);margin-top:4px}
+.about{text-align:center;color:var(--text3);font-size:12px;margin:18px 0 6px;line-height:1.8}
+
+/* ---------- 成员 ---------- */
+.member-list{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.member-chip{background:#f2f4f8;color:#475467;font-size:13px;padding:5px 10px;border-radius:999px;font-weight:600}
+.member-chip.me{background:var(--primary-weak);color:var(--primary)}
+.member-del{background:none;border:none;color:#98a2b3;margin-left:4px;cursor:pointer;font-weight:400;font-size:15px;padding:0 2px}
+
+/* ---------- 诊断 ---------- */
+.diag-pre{background:#f7f8fa;border:1px solid var(--line);border-radius:10px;padding:10px;font-size:12px;line-height:1.7;white-space:pre-wrap;word-break:break-word;margin:0 0 12px;font-family:Consolas,Menlo,monospace}
+
+/* ---------- 提示条 ---------- */
+#toast{position:fixed;top:auto;bottom:calc(env(safe-area-inset-bottom) + 86px);left:50%;transform:translateX(-50%) translateY(10px);background:rgba(17,24,39,.94);color:#fff;padding:10px 18px;border-radius:12px;font-size:14px;z-index:200;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;max-width:86vw;text-align:center;word-break:break-word}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ---------- 响应式 / 动效偏好 ---------- */
+@media (max-width:360px){
+  .stats-grid{gap:8px}
+  .stat{padding:11px}
+  .stat-v{font-size:19px}
+  .qa{padding:12px 4px;font-size:12px}
+  .main{padding-left:8px;padding-right:8px}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.001ms !important;animation-iteration-count:1 !important;transition-duration:.001ms !important}
+  .page{animation:none}
+}
+
+</style>
 </head>
 <body>
 <a class="skip-link" href="#main">跳到主要内容</a>
@@ -110,6 +476,3260 @@
 <div id="toast" role="status" aria-live="polite" aria-atomic="true" hidden></div>
 <input type="file" id="importInput" accept=".json,application/json" hidden>
 
-<script src="app.js"></script>
+<script>
+/* =====================================================
+   商机管家 v3.0 · LED 光电销售 CRM
+   客户 / 商机 / 跟进记录 / 提醒 / 拜访照片
+
+   v3 重点：
+   - 文字数据 localStorage + 照片 IndexedDB 分离存储
+   - schemaVersion + 迁移、损坏数据保留、自动快照、保存失败常驻告警
+   - 客户 / 商机 / 跟进 三张真正的表格视图
+   - 全量转义、CSP 收紧、CSV 公式注入防护
+   - 提醒可设到分钟、浏览器通知、日历 (.ics) 导出
+   ===================================================== */
+'use strict';
+
+/* ==================== 构建信息 ==================== */
+const APP_VERSION = 'v3.0';
+const BUILD_ID = '9ffbb8f32a';
+const BUILD_TIME = '2026-11-16 18:32';
+const BUILD_LABEL = BUILD_ID.indexOf('__') === 0 ? '开发版' : BUILD_ID;
+const BUILD_TIME_LABEL = BUILD_TIME.indexOf('__') === 0 ? '开发版' : BUILD_TIME;
+
+const SCHEMA_VERSION = 3;
+const DB_KEY = 'shangji-crm-v3';
+const LEGACY_V2_KEY = 'shangji-crm-v2';
+const LEGACY_V1_KEY = 'shangji-crm-db-v1';
+const CORRUPT_PREFIX = DB_KEY + '.corrupt.';
+const NOTIFY_SESSION_KEY = 'shangji-crm-notified';
+
+/* ==================== 业务常量 ==================== */
+const STAGES = [
+  {id:'lead',  name:'线索', cls:'st-lead'},
+  {id:'need',  name:'需求', cls:'st-need'},
+  {id:'intent',name:'意向', cls:'st-intent'},
+  {id:'plan',  name:'方案', cls:'st-plan'},
+  {id:'quote', name:'报价', cls:'st-quote'},
+  {id:'bid',   name:'投标', cls:'st-bid'},
+  {id:'deal',  name:'签单', cls:'st-deal'}
+];
+const STAGE_RULES = {
+  intent: {days:5, text:'意向阶段：5 天后推进方案沟通'},
+  quote:  {days:3, text:'报价阶段：3 天后跟进客户对报价的反馈'},
+  bid:    {days:2, text:'投标阶段：2 天后跟进投标进展'},
+  deal:   {days:7, text:'已签单：7 天后回访维护关系'}
+};
+const OPP_STATUS = ['进行中','丢单','暂停'];
+const INDUSTRIES = ['照明','工程','经销商','其他'];
+const SOURCES = ['展会','老客户转介绍','网络','上门陌拜'];
+const LEVELS = [['A','A 高价值'],['B','B 普通'],['C','C 潜力'],['D','D 休眠']];
+const CATEGORIES = ['LED投光灯','LED路灯','LED工矿灯','LED洗墙灯','LED线条灯','LED显示屏','驱动电源','智能控制系统','其他'];
+const FOLLOW_TYPES = ['电话沟通','微信','线上会议','上门拜访'];
+const PHOTO_MAX = 12;
+const PHOTO_EDGE = 1000;
+const PHOTO_QUALITY = 0.68;
+const PHOTO_MAX_BYTES = 25 * 1024 * 1024;
+const MAX_IMPORT_BYTES = 80 * 1024 * 1024;
+
+/* ==================== 运行状态 ==================== */
+let db = emptyDB();
+let photoCache = new Map();          /* photoId -> dataUrl */
+let pendingPhotos = [];              /* 迁移/导入时从备份里读出的照片 */
+let photoMode = 'unknown';           /* unknown | idb | none */
+let legacySourceKey = '';            /* 迁移成功后需要删除的旧键 */
+let photoMigrationFailed = false;
+let corruptInfo = null;              /* {raw, key, error} */
+let lastSnapshotAt = 0;
+let orphanSweepTimer = null;
+let toastTimer = null;
+let fatalTimer = null;
+let storageProbe = {done:false, ok:false, reason:''};
+
+const state = {
+  page: 'home',
+  custQuery: '', custView: 'list',
+  oppQuery: '', oppStage: 'all', oppView: 'kanban',
+  recQuery: '', recType: 'all', recView: 'timeline',
+  helpOpen: {}
+};
+
+const runtime = {
+  saveError: null,
+  lastSavedAt: 0,
+  unsaved: false,
+  photoBusy: false,
+  modalOpen: false,
+  modalOnClose: null,
+  lastFocus: null,
+  swStatus: 'unknown',
+  notificationsTried: new Set()
+};
+
+const dirtyPages = new Set(['home','customers','opps','records','more']);
+
+/* ==================== 基础工具 ==================== */
+const $ = s => document.querySelector(s);
+const $$ = s => Array.from(document.querySelectorAll(s));
+function show(el){ if(el) el.hidden = false; }
+function hide(el){ if(el) el.hidden = true; }
+function esc(s){
+  return String(s == null ? '' : s).replace(/[&<>"']/g, c => (
+    {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]
+  ));
+}
+function pad2(n){ n = String(n); return n.length < 2 ? '0' + n : n; }
+function pad4(n){ n = String(n); while(n.length < 4) n = '0' + n; return n; }
+function todayStr(){
+  const d = new Date();
+  return d.getFullYear() + '-' + pad2(d.getMonth()+1) + '-' + pad2(d.getDate());
+}
+function nowStr(){
+  const d = new Date();
+  return todayStr() + ' ' + pad2(d.getHours()) + ':' + pad2(d.getMinutes());
+}
+function nowInput(){
+  return todayStr() + 'T' + pad2(new Date().getHours()) + ':' + pad2(new Date().getMinutes());
+}
+function dstr(offset){
+  const d = new Date();
+  d.setDate(d.getDate() + offset);
+  return d.getFullYear() + '-' + pad2(d.getMonth()+1) + '-' + pad2(d.getDate());
+}
+function dstrAt(offset, hhmm){
+  return dstr(offset) + 'T' + (hhmm || '09:00');
+}
+function parseDateTime(v){
+  if(!v) return null;
+  if(v instanceof Date) return isNaN(v.getTime()) ? null : v;
+  let s = String(v).trim().replace(' ', 'T');
+  if(/^\d{4}-\d{2}-\d{2}$/.test(s)) s += 'T09:00';
+  if(!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/.test(s)) return null;
+  const d = new Date(s.slice(0,16) + ':00');
+  return isNaN(d.getTime()) ? null : d;
+}
+function normDateTime(v){
+  const d = parseDateTime(v);
+  if(!d) return '';
+  return d.getFullYear() + '-' + pad2(d.getMonth()+1) + '-' + pad2(d.getDate()) +
+    'T' + pad2(d.getHours()) + ':' + pad2(d.getMinutes());
+}
+function normDate(v){
+  const s = String(v == null ? '' : v).trim().slice(0, 10);
+  return /^\d{4}-\d{2}-\d{2}$/.test(s) ? s : '';
+}
+function fmtDT(v){
+  const d = parseDateTime(v);
+  if(!d) return '—';
+  return d.getFullYear() + '-' + pad2(d.getMonth()+1) + '-' + pad2(d.getDate()) +
+    ' ' + pad2(d.getHours()) + ':' + pad2(d.getMinutes());
+}
+function fmtDate(v){
+  const d = parseDateTime(v);
+  return d ? (d.getFullYear() + '-' + pad2(d.getMonth()+1) + '-' + pad2(d.getDate())) : '—';
+}
+function startOfDay(d){ return new Date(d.getFullYear(), d.getMonth(), d.getDate()); }
+function dayDiff(from, to){
+  return Math.round((startOfDay(to) - startOfDay(from)) / 86400000);
+}
+function numOrEmpty(v){
+  if(v === '' || v == null) return '';
+  const n = Number(v);
+  return isFinite(n) && n >= 0 ? Math.round(n * 100) / 100 : '';
+}
+function moneyOf(o){
+  const v = (o.dealAmount !== '' && o.dealAmount != null) ? o.dealAmount : o.amount;
+  const n = Number(v);
+  return isFinite(n) && n >= 0 ? n : 0;
+}
+function fmtWan(n){
+  if(n === '' || n == null) return '—';
+  const num = Number(n);
+  if(!isFinite(num)) return '—';
+  return num.toLocaleString('zh-CN', {maximumFractionDigits:2}) + ' 万';
+}
+function fmtWanOrZero(n){ return fmtWan(n == null || n === '' ? 0 : n); }
+function stageById(id){ return STAGES.find(s => s.id === id) || STAGES[0]; }
+function custById(id){ return db.customers.find(c => c.id === id); }
+function oppById(id){ return db.opps.find(o => o.id === id); }
+function custName(id){ const c = custById(id); return c ? c.name : '（已删除客户）'; }
+function normalizeFollowType(t){
+  if(FOLLOW_TYPES.indexOf(t) >= 0) return t;
+  if(t === '电话') return '电话沟通';
+  if(t === '拜访') return '上门拜访';
+  return '其他';
+}
+function uid(){
+  if(window.crypto && typeof crypto.randomUUID === 'function') return crypto.randomUUID();
+  return 'id_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 10);
+}
+function debounce(fn, ms){
+  let t = 0;
+  return function(){
+    const args = arguments;
+    clearTimeout(t);
+    t = setTimeout(() => fn.apply(null, args), ms);
+  };
+}
+function deepClone(v){ return JSON.parse(JSON.stringify(v)); }
+function isPhoneSafe(v){ return /^[0-9+\-()\s]{3,30}$/.test(String(v || '')); }
+function safeDataUrl(v){
+  if(typeof v !== 'string') return '';
+  if(v.length < 40 || v.length > 8 * 1024 * 1024) return '';
+  return /^data:image\/(?:jpeg|jpg|png|webp|gif);base64,[A-Za-z0-9+/=\s]+$/i.test(v) ? v.replace(/\s/g, '') : '';
+}
+
+/* ==================== 提示 / 错误 ==================== */
+function toast(msg){
+  const t = $('#toast');
+  if(!t) return;
+  t.textContent = msg;
+  show(t);
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2600);
+}
+function showFatal(msg){
+  try{
+    const box = $('#js-error');
+    const txt = $('#jsErrorText');
+    if(!box || !txt) return;
+    txt.textContent = '⚠️ 应用运行出错：' + msg;
+    box.hidden = false;
+    clearTimeout(fatalTimer);
+    fatalTimer = setTimeout(() => { box.hidden = true; }, 15000);
+  }catch(e){}
+}
+function bindErrorBar(){
+  const box = $('#js-error');
+  const btn = $('#jsErrorClose');
+  if(btn) btn.addEventListener('click', () => { if(box) box.hidden = true; });
+}
+window.addEventListener('error', function(e){
+  showFatal((e.message || e.type || '未知错误') + (e.lineno ? '（第 ' + e.lineno + ' 行）' : ''));
+});
+window.addEventListener('unhandledrejection', function(e){
+  const r = e && e.reason;
+  showFatal('异步操作失败：' + (r && (r.message || r.name) ? (r.message || r.name) : String(r || '未知错误')));
+});
+
+/* ==================== 本地存储 ==================== */
+function storageOK(){
+  if(storageProbe.done) return storageProbe.ok;
+  storageProbe.done = true;
+  try{
+    const k = '__shangji_probe__';
+    localStorage.setItem(k, '1');
+    localStorage.removeItem(k);
+    storageProbe.ok = true;
+  }catch(e){
+    storageProbe.ok = false;
+    storageProbe.reason = e && e.name ? e.name : 'Error';
+  }
+  return storageProbe.ok;
+}
+function readLS(key){
+  try{ return localStorage.getItem(key); }catch(e){ return null; }
+}
+function writeLS(key, value){
+  try{ localStorage.setItem(key, value); return true; }catch(e){ return false; }
+}
+function removeLS(key){
+  try{ localStorage.removeItem(key); return true; }catch(e){ return false; }
+}
+function storageUsageKB(){
+  try{
+    const raw = localStorage.getItem(DB_KEY) || '';
+    return Math.round(raw.length * 2 / 1024);
+  }catch(e){ return 0; }
+}
+
+/* ==================== IndexedDB（照片 / 快照） ==================== */
+const IDB_NAME = 'shangji-crm-store';
+const IDB_VERSION = 1;
+const IDB = {
+  supported: typeof indexedDB !== 'undefined',
+  db: null,
+  opening: null,
+  async open(){
+    if(this.db) return this.db;
+    if(!this.supported) throw new Error('浏览器不支持 IndexedDB');
+    if(this.opening) return this.opening;
+    this.opening = new Promise((resolve, reject) => {
+      let req;
+      try{ req = indexedDB.open(IDB_NAME, IDB_VERSION); }
+      catch(e){ reject(e); return; }
+      let settled = false;
+      const timer = setTimeout(() => {
+        if(settled) return;
+        settled = true;
+        reject(new Error('IndexedDB 打开超时'));
+      }, 2500);
+      req.onupgradeneeded = function(){
+        const d = req.result;
+        if(!d.objectStoreNames.contains('photos')) d.createObjectStore('photos', {keyPath:'id'});
+        if(!d.objectStoreNames.contains('snapshots')) d.createObjectStore('snapshots', {keyPath:'at'});
+      };
+      req.onsuccess = function(){
+        if(settled) return;
+        settled = true;
+        clearTimeout(timer);
+        IDB.db = req.result;
+        resolve(IDB.db);
+      };
+      req.onerror = function(){
+        if(settled) return;
+        settled = true;
+        clearTimeout(timer);
+        reject(req.error || new Error('打开 IndexedDB 失败'));
+      };
+      req.onblocked = function(){
+        if(settled) return;
+        settled = true;
+        clearTimeout(timer);
+        reject(new Error('IndexedDB 被其他窗口占用'));
+      };
+    });
+    try{ return await this.opening; }
+    finally{ this.opening = null; }
+  },
+  async request(storeName, mode, action){
+    const d = await this.open();
+    return new Promise((resolve, reject) => {
+      let tx;
+      try{ tx = d.transaction(storeName, mode); }
+      catch(e){ reject(e); return; }
+      const store = tx.objectStore(storeName);
+      let req, value;
+      try{ req = action(store); }
+      catch(e){ reject(e); return; }
+      req.onsuccess = function(){ value = req.result; };
+      req.onerror = function(){ reject(req.error || new Error('存储操作失败')); };
+      tx.oncomplete = function(){ resolve(value); };
+      tx.onerror = function(){ reject(tx.error || new Error('存储事务失败')); };
+      tx.onabort = function(){ reject(tx.error || new Error('存储事务中止')); };
+    });
+  }
+};
+
+async function initPhotoStore(){
+  if(!IDB.supported){ photoMode = 'none'; return; }
+  try{
+    await IDB.open();
+    photoMode = 'idb';
+  }catch(e){
+    photoMode = 'none';
+    if(pendingPhotos.length) photoMigrationFailed = true;
+    return;
+  }
+  try{
+    const all = await IDB.request('photos', 'readonly', s => s.getAll());
+    (all || []).forEach(p => {
+      const src = safeDataUrl(p && p.src);
+      if(p && p.id && src) photoCache.set(p.id, src);
+    });
+    for(const p of pendingPhotos){
+      try{
+        await persistPhotoWithId(p.id, p.dataUrl);
+      }catch(e){ photoMigrationFailed = true; }
+    }
+    pendingPhotos = [];
+    await sweepOrphans();
+  }catch(e){
+    photoMode = 'none';
+    photoMigrationFailed = true;
+  }
+}
+
+function photoSrc(id){
+  const src = photoCache.get(id);
+  return src ? safeDataUrl(src) : '';
+}
+function photoCount(){ return photoCache.size; }
+
+/* 首次打开 IndexedDB 超时/失败后，允许在真正添加照片时再试一次 */
+async function ensurePhotoStore(){
+  if(photoMode === 'idb') return true;
+  if(!IDB.supported) return false;
+  try{
+    await IDB.open();
+    photoMode = 'idb';
+    const all = await IDB.request('photos', 'readonly', s => s.getAll());
+    (all || []).forEach(p => {
+      const src = safeDataUrl(p && p.src);
+      if(p && p.id && src) photoCache.set(p.id, src);
+    });
+    if(pendingPhotos.length){
+      let failed = false;
+      for(const p of pendingPhotos){
+        try{ await persistPhotoWithId(p.id, p.dataUrl); }
+        catch(e){ failed = true; }
+      }
+      if(!failed){ pendingPhotos = []; photoMigrationFailed = false; }
+      else photoMigrationFailed = true;
+    }
+    return true;
+  }catch(e){
+    photoMode = 'none';
+    return false;
+  }
+}
+
+async function persistPhotoWithId(id, dataUrl){
+  const src = safeDataUrl(dataUrl);
+  if(!src) throw new Error('照片格式不受支持');
+  if(photoMode !== 'idb'){
+    const ok = await ensurePhotoStore();
+    if(!ok) throw new Error('当前浏览器无法保存照片');
+  }
+  await IDB.request('photos', 'readwrite', s => s.put({id: id, src: src, createdAt:Date.now()}));
+  photoCache.set(id, src);
+  return id;
+}
+async function persistPhoto(dataUrl){
+  return persistPhotoWithId('p_' + uid(), dataUrl);
+}
+async function deletePhotoIds(ids){
+  for(const id of ids || []){
+    photoCache.delete(id);
+    try{ await IDB.request('photos', 'readwrite', s => s.delete(id)); }catch(e){}
+  }
+}
+function referencedPhotoIds(){
+  const set = new Set();
+  db.records.forEach(r => (r.photos || []).forEach(id => set.add(id)));
+  pendingPhotos.forEach(p => set.add(p.id));
+  tempPhotos.forEach(p => set.add(p.id));
+  return set;
+}
+function sweepOrphans(){
+  if(orphanSweepTimer) clearTimeout(orphanSweepTimer);
+  orphanSweepTimer = setTimeout(async function(){
+    if(photoMode !== 'idb') return;
+    const refs = referencedPhotoIds();
+    const orphans = [];
+    photoCache.forEach((v, id) => { if(!refs.has(id)) orphans.push(id); });
+    if(!orphans.length) return;
+    if(orphans.length > 60){
+      /* 大量清理时整体重建，避免逐条事务过慢 */
+      for(const id of orphans) photoCache.delete(id);
+      try{
+        const all = await IDB.request('photos', 'readonly', s => s.getAll());
+        const keep = (all || []).filter(p => refs.has(p.id));
+        await IDB.request('photos', 'readwrite', s => s.clear());
+        for(const p of keep) await IDB.request('photos', 'readwrite', s => s.put(p));
+      }catch(e){}
+    }else{
+      await deletePhotoIds(orphans);
+    }
+  }, 400);
+}
+
+/* ---------- 自动快照 ---------- */
+async function takeSnapshot(reason, snapshotDb){
+  if(photoMode !== 'idb' && !IDB.supported) return false;
+  /* 先同步序列化，避免 await 期间数据已经变化 */
+  let text;
+  try{ text = JSON.stringify(snapshotDb || db); }
+  catch(e){ return false; }
+  if(!text || text.length > 2.5 * 1024 * 1024) return false;
+  try{
+    await IDB.open();
+    const at = Date.now();
+    const snapDb = snapshotDb || db;
+    await IDB.request('snapshots', 'readwrite', s => s.put({
+      at, time: nowStr(), reason: reason || 'auto', schemaVersion: SCHEMA_VERSION,
+      summary: {
+        customers: (snapDb.customers || []).length,
+        opps: (snapDb.opps || []).length,
+        records: (snapDb.records || []).length,
+        reminders: (snapDb.reminders || []).length
+      },
+      text
+    }));
+    lastSnapshotAt = at;
+    const all = await IDB.request('snapshots', 'readonly', s => s.getAll());
+    const sorted = (all || []).sort((a, b) => b.at - a.at);
+    for(const old of sorted.slice(8)){
+      try{ await IDB.request('snapshots', 'readwrite', s => s.delete(old.at)); }catch(e){}
+    }
+    return true;
+  }catch(e){ return false; }
+}
+function maybeSnapshot(){
+  if(photoMode !== 'idb') return;
+  if(Date.now() - lastSnapshotAt < 6 * 3600 * 1000) return;
+  lastSnapshotAt = Date.now();
+  takeSnapshot('auto');
+}
+async function listSnapshots(){
+  try{
+    const all = await IDB.request('snapshots', 'readonly', s => s.getAll());
+    return (all || []).sort((a, b) => b.at - a.at);
+  }catch(e){ return []; }
+}
+async function readSnapshot(at){
+  try{
+    const v = await IDB.request('snapshots', 'readonly', s => s.get(at));
+    return v && v.text ? v : null;
+  }catch(e){ return null; }
+}
+
+/* ==================== 数据规范化 / 迁移 ==================== */
+function emptyDB(){
+  return {
+    schemaVersion: SCHEMA_VERSION,
+    customers: [], opps: [], records: [], reminders: [],
+    settings: {me:'我', members:['我'], lastExportAt:'', notify:false, ui:{}},
+    seq: {c:1, o:1},
+    savedAt: ''
+  };
+}
+function asString(v, max){
+  if(v == null) return '';
+  const s = String(v);
+  return s.length > max ? s.slice(0, max) : s;
+}
+function normId(v, prefix, seen){
+  let id = asString(v, 80);
+  if(!/^[A-Za-z0-9_-]{1,80}$/.test(id) || seen.has(id)){
+    id = prefix + '_' + uid();
+  }
+  seen.add(id);
+  return id;
+}
+function nextCodeNumber(list, prefix){
+  let max = 0;
+  (list || []).forEach(x => {
+    const m = new RegExp('^' + prefix + '(\\d{1,6})$').exec(String(x.code || ''));
+    if(m) max = Math.max(max, Number(m[1]));
+  });
+  return max + 1;
+}
+function assignCodes(list, prefix, start){
+  const seen = new Set();
+  let n = start;
+  list.forEach(x => {
+    let code = asString(x.code, 20);
+    if(!code || seen.has(code)) code = prefix + pad4(n++);
+    seen.add(code);
+    x.code = code;
+    const m = new RegExp('^' + prefix + '(\\d{1,6})$').exec(code);
+    if(m) n = Math.max(n, Number(m[1]) + 1);
+  });
+  return n;
+}
+
+function normalizeDB(input, opts){
+  const options = opts || {};
+  const out = emptyDB();
+  const photos = [];
+  const seenC = new Set(), seenO = new Set(), seenR = new Set(), seenM = new Set();
+  let dropped = 0;
+
+  if(!input || typeof input !== 'object') return {db: out, photos: photos, dropped: 0};
+
+  const customers = Array.isArray(input.customers) ? input.customers : [];
+  const opps = Array.isArray(input.opps) ? input.opps : [];
+  const records = Array.isArray(input.records) ? input.records : [];
+  const reminders = Array.isArray(input.reminders) ? input.reminders : [];
+
+  customers.slice(0, 20000).forEach(raw => {
+    if(!raw || typeof raw !== 'object'){ dropped++; return; }
+    const c = {
+      id: normId(raw.id, 'c', seenC),
+      code: asString(raw.code, 20),
+      name: asString(raw.name, 120).trim() || '未命名客户',
+      industry: INDUSTRIES.indexOf(raw.industry) >= 0 ? raw.industry : '其他',
+      address: asString(raw.address, 300),
+      contact: asString(raw.contact, 60),
+      position: asString(raw.position, 60),
+      phone: asString(raw.phone, 40),
+      wechat: asString(raw.wechat, 60),
+      email: asString(raw.email, 120),
+      source: SOURCES.indexOf(raw.source) >= 0 ? raw.source : '网络',
+      owner: asString(raw.owner, 40) || '我',
+      level: LEVELS.some(l => l[0] === raw.level) ? raw.level : 'B',
+      remark: asString(raw.remark, 3000),
+      createdAt: asString(raw.createdAt, 20) || nowStr(),
+      lastFollowAt: ''
+    };
+    out.customers.push(c);
+  });
+
+  opps.slice(0, 20000).forEach(raw => {
+    if(!raw || typeof raw !== 'object'){ dropped++; return; }
+    const history = [];
+    (Array.isArray(raw.history) ? raw.history : []).slice(-200).forEach(h => {
+      if(!h || typeof h !== 'object') return;
+      history.push({at: asString(h.at, 20), from: asString(h.from, 20), to: asString(h.to, 20)});
+    });
+    const stage = STAGES.some(s => s.id === raw.stage) ? raw.stage : 'lead';
+    let status = OPP_STATUS.indexOf(raw.status) >= 0 ? raw.status : '进行中';
+    if(stage === 'deal' && status === '丢单') status = '进行中';
+    out.opps.push({
+      id: normId(raw.id, 'o', seenO),
+      code: asString(raw.code, 20),
+      customerId: asString(raw.customerId, 80),
+      name: asString(raw.name, 160).trim() || '未命名商机',
+      stage: stage,
+      amount: numOrEmpty(raw.amount),
+      expectDate: normDate(raw.expectDate),
+      dealAmount: numOrEmpty(raw.dealAmount),
+      category: CATEGORIES.indexOf(raw.category) >= 0 ? raw.category : '其他',
+      competitor: asString(raw.competitor, 120),
+      status: status,
+      lostReason: asString(raw.lostReason, 600),
+      owner: asString(raw.owner, 40) || '我',
+      history: history,
+      winAt: normDate(raw.winAt),
+      createdAt: asString(raw.createdAt, 20) || nowStr(),
+      updatedAt: asString(raw.updatedAt, 20) || nowStr()
+    });
+  });
+
+  const photoData = [];
+  records.slice(0, 30000).forEach(raw => {
+    if(!raw || typeof raw !== 'object'){ dropped++; return; }
+    const ids = [];
+    (Array.isArray(raw.photos) ? raw.photos : []).slice(0, PHOTO_MAX).forEach(p => {
+      if(typeof p !== 'string') return;
+      if(/^[A-Za-z0-9_-]{1,80}$/.test(p)){ ids.push(p); return; }
+      const src = safeDataUrl(p);
+      if(src){
+        const pid = 'p_' + uid();
+        photos.push({id: pid, dataUrl: src});
+        ids.push(pid);
+      }
+    });
+    photoData.push(ids);
+    out.records.push({
+      id: normId(raw.id, 'r', seenR),
+      customerId: asString(raw.customerId, 80),
+      oppId: asString(raw.oppId, 80),
+      type: normalizeFollowType(asString(raw.type, 20)),
+      time: normDateTime(raw.time) || nowInput(),
+      content: asString(raw.content, 5000),
+      feedback: asString(raw.feedback, 5000),
+      nextPlan: asString(raw.nextPlan, 5000),
+      remindAt: normDateTime(raw.remindAt),
+      photos: [],
+      owner: asString(raw.owner, 40) || '我',
+      createdAt: asString(raw.createdAt, 20) || nowStr()
+    });
+  });
+  out.records.forEach((r, i) => { r.photos = photoData[i] || []; });
+
+  reminders.slice(0, 30000).forEach(raw => {
+    if(!raw || typeof raw !== 'object') return;
+    const text = asString(raw.text, 300).trim();
+    const remindAt = normDateTime(raw.remindAt);
+    if(!text || !remindAt) return;
+    out.reminders.push({
+      id: normId(raw.id, 'm', seenM),
+      customerId: asString(raw.customerId, 80),
+      oppId: asString(raw.oppId, 80),
+      recordId: asString(raw.recordId, 80),
+      kind: raw.kind === 'stage' ? 'stage' : (raw.kind === 'follow' ? 'follow' : 'manual'),
+      text: text,
+      remindAt: remindAt,
+      done: !!raw.done,
+      createdAt: asString(raw.createdAt, 20) || nowStr()
+    });
+  });
+
+  /* 设置 */
+  const rs = input.settings && typeof input.settings === 'object' ? input.settings : {};
+  const members = [];
+  (Array.isArray(rs.members) ? rs.members : []).forEach(m => {
+    const v = asString(m, 40).trim();
+    if(v && members.indexOf(v) < 0 && members.length < 30) members.push(v);
+  });
+  if(!members.length) members.push('我');
+  let me = asString(rs.me, 40).trim() || members[0];
+  if(members.indexOf(me) < 0) members.push(me);
+  out.settings = {
+    me: me,
+    members: members,
+    lastExportAt: asString(rs.lastExportAt, 20),
+    notify: !!rs.notify,
+    ui: {}
+  };
+  if(rs.ui && typeof rs.ui === 'object'){
+    if(['kanban','list','table'].indexOf(rs.ui.oppView) >= 0) out.settings.ui.oppView = rs.ui.oppView;
+    if(['list','table'].indexOf(rs.ui.custView) >= 0) out.settings.ui.custView = rs.ui.custView;
+    if(['timeline','table'].indexOf(rs.ui.recView) >= 0) out.settings.ui.recView = rs.ui.recView;
+  }
+
+  /* 编号 */
+  assignCodes(out.customers, 'C', 1);
+  assignCodes(out.opps, 'O', 1);
+  out.seq = {c: nextCodeNumber(out.customers, 'C'), o: nextCodeNumber(out.opps, 'O')};
+  if(input.seq && typeof input.seq === 'object'){
+    out.seq.c = Math.max(out.seq.c, Number(input.seq.c) || 1);
+    out.seq.o = Math.max(out.seq.o, Number(input.seq.o) || 1);
+  }
+
+  /* 清掉已经指向不存在记录的提醒 */
+  const custIds = new Set(out.customers.map(c => c.id));
+  const oppIds = new Set(out.opps.map(o => o.id));
+  const recIds = new Set(out.records.map(r => r.id));
+  out.reminders = out.reminders.filter(r => {
+    if(r.customerId && !custIds.has(r.customerId)) return false;
+    if(r.oppId && !oppIds.has(r.oppId)) return false;
+    if(r.recordId && !recIds.has(r.recordId)) return false;
+    if(r.kind === 'stage' && r.oppId){
+      const op = out.opps.find(o => o.id === r.oppId);
+      if(!op || !STAGE_RULES[op.stage] || op.status === '丢单') return false;
+    }
+    return true;
+  });
+
+  /* 记录关联修正：客户不存在时保留记录但清空关联；商机必须属于该客户 */
+  out.records.forEach(r => {
+    if(r.customerId && !custIds.has(r.customerId)) r.customerId = '';
+    if(r.oppId){
+      const op = out.opps.find(o => o.id === r.oppId);
+      if(!op || (r.customerId && op.customerId !== r.customerId)) r.oppId = '';
+    }
+  });
+
+  /* 跟进提醒必须和记录保持联动（客户/商机/时间/文本） */
+  out.records.forEach(r => {
+    const rem = out.reminders.find(x => x.recordId === r.id);
+    if(!r.remindAt){
+      if(rem) out.reminders = out.reminders.filter(x => x.id !== rem.id);
+      return;
+    }
+    const c = out.customers.find(x => x.id === r.customerId);
+    const text = '跟进「' + (c ? c.name : '（已删除客户）') + '」' +
+      (r.nextPlan ? ('：' + r.nextPlan.slice(0, 40)) : '');
+    if(rem){
+      rem.customerId = r.customerId;
+      rem.oppId = r.oppId || '';
+      rem.kind = 'follow';
+      rem.text = text;
+      rem.remindAt = r.remindAt;
+    }else{
+      out.reminders.push({
+        id: 'm_' + uid(), customerId: r.customerId, oppId: r.oppId || '',
+        recordId: r.id, kind: 'follow', text: text, remindAt: r.remindAt,
+        done: false, createdAt: nowStr()
+      });
+    }
+  });
+
+  /* 最后跟进时间永远由记录重新计算 */
+  out.customers.forEach(c => {
+    let latest = '';
+    out.records.forEach(r => {
+      if(r.customerId !== c.id) return;
+      const t = fmtDT(r.time);
+      if(t !== '—' && t > latest) latest = t;
+    });
+    c.lastFollowAt = latest;
+  });
+
+  return {db: out, photos: photos, dropped: dropped};
+}
+
+function migrateV1(o){
+  if(!o || !Array.isArray(o.customers)) return null;
+  const out = emptyDB();
+  const idMap = {};
+  (o.customers || []).forEach(c => {
+    const oldId = asString(c.id, 80);
+    const id = 'c_' + uid();
+    idMap[oldId] = id;
+    out.customers.push({
+      id, code: '', name: asString(c.name, 120) || '未命名',
+      industry: INDUSTRIES.indexOf(c.industry) >= 0 ? c.industry : '其他',
+      address: asString(c.address, 300), contact: asString(c.contact, 60), position: '',
+      phone: asString(c.phone, 40), wechat: '', email: '',
+      source: SOURCES.indexOf(c.source) >= 0 ? c.source : '网络',
+      owner: asString(c.owner, 40) || '我',
+      level: ['A','B','C','D'].indexOf(c.level) >= 0 ? c.level : 'B',
+      remark: asString(c.remark, 3000), createdAt: asString(c.createdAt, 20) || nowStr(),
+      lastFollowAt: ''
+    });
+  });
+  (o.opps || []).forEach(op => {
+    const stage = STAGES.some(s => s.id === op.stage) ? op.stage : 'lead';
+    const amtYuan = Number(op.amount) || 0;
+    out.opps.push({
+      id: 'o_' + uid(), code: '', customerId: idMap[op.customerId] || '',
+      name: asString(op.name, 160) || '未命名商机', stage,
+      amount: amtYuan ? Math.round(amtYuan / 100) / 100 : '',
+      expectDate: normDate(op.expectDate), dealAmount: '', category: '其他',
+      competitor: '', status: '进行中', lostReason: '', owner: '我',
+      history: [{at: nowStr(), from: '—', to: stageById(stage).name}],
+      winAt: stage === 'deal' ? normDate(op.winDate) : '',
+      createdAt: asString(op.createdAt, 20) || nowStr(), updatedAt: nowStr()
+    });
+  });
+  (o.records || []).forEach(r => {
+    const time = normDateTime(asString(r.date, 20).replace(' ', 'T')) || nowInput();
+    out.records.push({
+      id: 'r_' + uid(), customerId: idMap[r.customerId] || '', oppId: '',
+      type: normalizeFollowType(r.type), time,
+      content: asString(r.content, 5000), feedback: '', nextPlan: '',
+      remindAt: normDateTime(r.nextDate), photos: [], owner: '我',
+      createdAt: asString(r.createdAt, 20) || nowStr()
+    });
+  });
+  return out;
+}
+
+function loadFromStorage(){
+  const candidates = [
+    {key: DB_KEY, source: 'v3'},
+    {key: LEGACY_V2_KEY, source: 'v2'},
+    {key: LEGACY_V1_KEY, source: 'v1'}
+  ];
+  for(const cand of candidates){
+    const raw = readLS(cand.key);
+    if(raw == null) continue;
+    let parsed;
+    try{
+      parsed = JSON.parse(raw);
+      if(cand.source === 'v1') parsed = migrateV1(parsed);
+      if(!parsed || typeof parsed !== 'object' ||
+         (!Array.isArray(parsed.customers) && !Array.isArray(parsed.opps) && !Array.isArray(parsed.records))){
+        throw new Error('数据结构不完整');
+      }
+      const n = normalizeDB(parsed);
+      legacySourceKey = cand.source === 'v3' ? '' : cand.key;
+      return n;
+    }catch(e){
+      if(cand.source === 'v3'){
+        let backupKey = '';
+        try{
+          backupKey = CORRUPT_PREFIX + Date.now();
+          localStorage.setItem(backupKey, raw);
+        }catch(e2){ backupKey = ''; }
+        corruptInfo = {raw: raw, key: backupKey, error: e && e.message ? e.message : '解析失败'};
+        return {db: emptyDB(), photos: [], dropped: 0};
+      }
+      /* 旧版键损坏：跳过，继续找更旧的备份；原始串不删 */
+    }
+  }
+  return {db: emptyDB(), photos: [], dropped: 0};
+}
+
+function initDB(){
+  const r = loadFromStorage();
+  db = r.db;
+  pendingPhotos = r.photos || [];
+  if(db.settings.ui){
+    if(db.settings.ui.oppView) state.oppView = db.settings.ui.oppView;
+    if(db.settings.ui.custView) state.custView = db.settings.ui.custView;
+    if(db.settings.ui.recView) state.recView = db.settings.ui.recView;
+  }
+}
+
+/* ==================== 保存 ==================== */
+function persistUISettings(){
+  db.settings.ui = {oppView: state.oppView, custView: state.custView, recView: state.recView};
+}
+function save(opts){
+  const options = opts || {};
+  persistUISettings();
+  db.savedAt = nowStr();
+  let text;
+  try{ text = JSON.stringify(db); }
+  catch(e){
+    runtime.saveError = '数据无法序列化：' + (e.message || e);
+    runtime.unsaved = true;
+    renderGlobal();
+    return false;
+  }
+  try{
+    localStorage.setItem(DB_KEY, text);
+    runtime.saveError = null;
+    runtime.unsaved = false;
+    runtime.lastSavedAt = Date.now();
+    if(legacySourceKey && !photoMigrationFailed){
+      removeLS(legacySourceKey);
+      legacySourceKey = '';
+    }
+    if(options.snapshot === true) takeSnapshot(options.reason || 'manual');
+    else maybeSnapshot();
+    renderSaveState();
+    renderGlobal();
+    return true;
+  }catch(e){
+    const reason = e && e.name === 'QuotaExceededError' ? '浏览器存储空间已满' : (e && e.message ? e.message : '未知错误');
+    runtime.saveError = reason;
+    runtime.unsaved = true;
+    renderSaveState();
+    renderGlobal();
+    if(!options.silent) toast('保存失败：' + reason + '。数据尚未写入，请立即导出备份！');
+    return false;
+  }
+}
+function commit(message, opts){
+  const ok = save(opts);
+  if(ok){
+    if(message) toast(message);
+  }else{
+    toast('保存失败！修改只在内存中，请立即到「我的」导出备份');
+  }
+  return ok;
+}
+function renderSaveState(){
+  const el = $('#saveState');
+  if(!el) return;
+  if(runtime.saveError){
+    el.textContent = '未保存';
+    el.className = 'save-state bad';
+    el.title = '保存失败：' + runtime.saveError;
+  }else if(runtime.lastSavedAt){
+    const d = new Date(runtime.lastSavedAt);
+    el.textContent = '已保存 ' + pad2(d.getHours()) + ':' + pad2(d.getMinutes());
+    el.className = 'save-state ok';
+    el.title = '数据已写入本地';
+  }else{
+    el.textContent = '';
+    el.className = 'save-state';
+  }
+}
+
+/* ==================== 全局状态条 ==================== */
+function globalMessages(){
+  const list = [];
+  if(!storageOK()){
+    list.push({tone:'red', text: storageProbe.reason === 'QuotaExceededError'
+      ? '浏览器本地存储空间已满，新的修改无法写入。请先导出备份，再清理旧数据/照片。'
+      : '当前浏览器禁用了本地存储（无痕模式或站点权限被拒），任何修改都无法保存。请改用普通浏览模式。'});
+  }
+  if(runtime.saveError){
+    list.push({tone:'red', text:'保存失败：' + runtime.saveError + '。内存中的修改尚未写入，刷新或关闭页面会丢失。请立即导出备份。',
+      actions:'<button class="banner-btn" data-banner="export">立即导出备份</button><button class="banner-btn" data-banner="retry">重试保存</button>'});
+  }
+  if(photoMode === 'none' && (db.records.some(r => (r.photos || []).length) || pendingPhotos.length)){
+    list.push({tone:'orange', text:'照片存储（IndexedDB）不可用，历史照片可能无法显示；文字数据不受影响。'});
+  }
+  if(photoMigrationFailed){
+    list.push({tone:'orange', text:'旧版照片迁移未全部完成，旧数据键已保留以防丢失。请先导出 JSON 备份，再换用普通浏览模式重新打开。'});
+  }
+  if(corruptInfo){
+    list.push({tone:'red', text:'检测到本地数据损坏。原始内容已备份' + (corruptInfo.key ? '（键 ' + corruptInfo.key + '）' : '在内存中') + '，请先下载原始数据再决定是否重建。',
+      actions:'<button class="banner-btn" data-banner="corrupt">查看处理</button>'});
+  }
+  const total = db.customers.length + db.opps.length + db.records.length;
+  if(storageOK() && total >= 5 && (state.page === 'home' || state.page === 'more')){
+    const last = db.settings.lastExportAt ? parseDateTime(db.settings.lastExportAt) : null;
+    const days = last ? dayDiff(last, new Date()) : null;
+    if(!last || days > 30){
+      list.push({tone:'blue', text:last ? ('已经 ' + days + ' 天没有导出备份了，数据只存在这台设备上。') : '还没有导出过备份。数据只存在这台设备上，清缓存/换设备会全部丢失。',
+        actions:'<button class="banner-btn" data-banner="export">导出 JSON 备份</button>'});
+    }
+  }
+  if(corruptInfo) return list.slice(0, 1);
+  return list;
+}
+function renderGlobal(){
+  const el = $('#globalBanner');
+  if(!el) return;
+  const msgs = globalMessages();
+  if(!msgs.length){ el.hidden = true; el.innerHTML = ''; return; }
+  el.hidden = false;
+  el.innerHTML = msgs.map(m =>
+    '<div class="global-banner-inner banner-' + m.tone + '"><div class="banner-text">' + esc(m.text) + '</div>' +
+    (m.actions ? '<div class="banner-actions">' + m.actions + '</div>' : '') + '</div>'
+  ).join('');
+}
+
+/* ==================== 统计 ==================== */
+function getStats(){
+  const month = todayStr().slice(0, 7);
+  const won = db.opps.filter(o => o.stage === 'deal');
+  const lost = db.opps.filter(o => o.stage !== 'deal' && o.status === '丢单');
+  const closed = won.length + lost.length;
+  const monthWon = won.filter(o => o.winAt && o.winAt.slice(0, 7) === month);
+  let monthAmt = 0, totalAmt = 0;
+  monthWon.forEach(o => { monthAmt += moneyOf(o); });
+  won.forEach(o => { totalAmt += moneyOf(o); });
+  const active = db.opps.filter(o => o.status === '进行中' && o.stage !== 'deal').length;
+  const followMonth = db.records.filter(r => (r.time || '').slice(0, 7) === month).length;
+  const rate = closed ? Math.round(won.length / closed * 1000) / 10 : 0;
+  return {
+    month, total: db.opps.length, won: won.length, lost: lost.length, closed: closed,
+    monthWon: monthWon.length, monthAmt, totalAmt, active, followMonth, rate
+  };
+}
+
+/* ==================== 提醒 ==================== */
+function reminderLabel(remindAt){
+  const d = parseDateTime(remindAt);
+  if(!d) return '时间未设置';
+  const diff = dayDiff(new Date(), d);
+  const hm = pad2(d.getHours()) + ':' + pad2(d.getMinutes());
+  if(diff < 0) return '逾期 ' + (-diff) + ' 天';
+  if(diff === 0) return d.getTime() < Date.now() ? ('今天 ' + hm + '（已过时）') : ('今天 ' + hm);
+  if(diff === 1) return '明天 ' + hm;
+  if(diff <= 7) return diff + ' 天后 ' + hm;
+  return fmtDate(d) + ' ' + hm;
+}
+function isDue(r){
+  const d = parseDateTime(r.remindAt);
+  return !!d && !r.done && d.getTime() <= Date.now();
+}
+function getReminders(){
+  return db.reminders.slice().sort((a, b) => {
+    if(a.done !== b.done) return a.done ? 1 : -1;
+    return (a.remindAt || '').localeCompare(b.remindAt || '');
+  });
+}
+function getDueReminders(){
+  return getReminders().filter(isDue);
+}
+function findReminderForRecord(recordId){
+  return db.reminders.find(r => r.recordId === recordId);
+}
+function syncRecordReminder(rec){
+  const old = db.reminders.find(r => r.recordId === rec.id);
+  if(!rec.remindAt){
+    if(old) db.reminders = db.reminders.filter(r => r.id !== old.id);
+    return;
+  }
+  const plan = rec.nextPlan ? ('：' + String(rec.nextPlan).slice(0, 40)) : '';
+  const text = '跟进「' + custName(rec.customerId) + '」' + plan;
+  if(old){
+    const changed = old.remindAt !== rec.remindAt || old.customerId !== rec.customerId ||
+      (old.oppId || '') !== (rec.oppId || '');
+    old.customerId = rec.customerId;
+    old.oppId = rec.oppId || '';
+    old.text = text;
+    old.remindAt = rec.remindAt;
+    if(changed) old.done = false;
+    return;
+  }
+  db.reminders.push({
+    id: 'm_' + uid(), customerId: rec.customerId, oppId: rec.oppId || '',
+    recordId: rec.id, kind: 'follow', text: text, remindAt: rec.remindAt,
+    done: false, createdAt: nowStr()
+  });
+}
+function syncStageReminder(o, reset){
+  const rule = STAGE_RULES[o.stage];
+  const exist = db.reminders.find(r => r.oppId === o.id && r.kind === 'stage' && !r.done);
+  if(o.status === '丢单' || !rule){
+    if(exist) db.reminders = db.reminders.filter(r => r.id !== exist.id);
+    return;
+  }
+  const text = '「' + custName(o.customerId) + '·' + o.name + '」' + rule.text;
+  if(exist){
+    exist.text = text;
+    exist.customerId = o.customerId;
+    if(reset !== false){
+      const remindAt = dstrAt(rule.days, '09:00');
+      if(exist.remindAt !== remindAt){ exist.remindAt = remindAt; exist.done = false; }
+    }
+    return;
+  }
+  db.reminders.push({
+    id: 'm_' + uid(), customerId: o.customerId, oppId: o.id, recordId: '',
+    kind: 'stage', text: text, remindAt: dstrAt(rule.days, '09:00'), done: false, createdAt: nowStr()
+  });
+}
+function completeReminder(id){
+  const r = db.reminders.find(x => x.id === id);
+  if(!r) return;
+  r.done = true;
+  commit('已完成提醒');
+  invalidateAll();
+  renderActive();
+}
+/* ==================== 浏览器通知 / 日历 ==================== */
+function notificationSupported(){
+  return typeof window.Notification !== 'undefined' && window.isSecureContext;
+}
+async function requestNotifications(){
+  if(!notificationSupported()){
+    toast('此浏览器或当前打开方式不支持通知（需 HTTPS 或 localhost）');
+    return false;
+  }
+  try{
+    const p = await Notification.requestPermission();
+    db.settings.notify = (p === 'granted');
+    save();
+    if(p === 'granted') toast('已开启浏览器通知；应用打开时会提醒到期的跟进');
+    else if(p === 'denied') toast('通知权限被拒绝，可在浏览器站点设置中重新开启');
+    else toast('未开启通知');
+    return p === 'granted';
+  }catch(e){
+    toast('无法请求通知权限');
+    return false;
+  }
+}
+function notifiedSet(){
+  try{
+    const raw = sessionStorage.getItem(NOTIFY_SESSION_KEY);
+    return new Set(raw ? JSON.parse(raw) : []);
+  }catch(e){ return new Set(); }
+}
+function saveNotifiedSet(set){
+  try{ sessionStorage.setItem(NOTIFY_SESSION_KEY, JSON.stringify(Array.from(set))); }catch(e){}
+}
+let swReadyPromise = null;
+function getSWRegistration(timeoutMs){
+  if(!('serviceWorker' in navigator)) return Promise.resolve(null);
+  if(!swReadyPromise){
+    swReadyPromise = Promise.race([
+      navigator.serviceWorker.ready,
+      new Promise(resolve => setTimeout(() => resolve(null), timeoutMs || 1200))
+    ]).catch(() => null);
+  }
+  return swReadyPromise;
+}
+async function systemNotify(title, options){
+  try{
+    const reg = await getSWRegistration(1200);
+    if(reg && typeof reg.showNotification === 'function'){
+      await reg.showNotification(title, options);
+      return true;
+    }
+  }catch(e){}
+  try{
+    new Notification(title, options);
+    return true;
+  }catch(e){
+    return false;
+  }
+}
+async function checkDueNotifications(){
+  const due = getDueReminders();
+  if(!due.length) return;
+  if(notificationSupported() && Notification.permission === 'granted'){
+    const notified = notifiedSet();
+    for(const r of due.slice(0, 5)){
+      if(notified.has(r.id)) continue;
+      const ok = await systemNotify('商机管家 · 跟进提醒', {
+        body: r.text + '\n' + fmtDT(r.remindAt),
+        tag: 'shangji-' + r.id
+      });
+      if(ok) notified.add(r.id);
+    }
+    saveNotifiedSet(notified);
+  }
+  if(runtime.notificationsTried.has('toast:' + todayStr())) return;
+  runtime.notificationsTried.add('toast:' + todayStr());
+  toast('有 ' + due.length + ' 项跟进提醒已到期，请在首页查看');
+}
+function icsEscape(s){
+  return String(s == null ? '' : s).replace(/\\/g, '\\\\').replace(/;/g, '\\;')
+    .replace(/,/g, '\\,').replace(/\r?\n/g, '\\n');
+}
+function icsTime(d){
+  return d.getUTCFullYear() + pad2(d.getUTCMonth()+1) + pad2(d.getUTCDate()) + 'T' +
+    pad2(d.getUTCHours()) + pad2(d.getUTCMinutes()) + pad2(d.getUTCSeconds()) + 'Z';
+}
+function exportICS(){
+  const list = db.reminders.filter(r => !r.done && parseDateTime(r.remindAt));
+  if(!list.length){ toast('没有待办提醒可导出'); return; }
+  const stamp = icsTime(new Date());
+  const lines = [
+    'BEGIN:VCALENDAR', 'VERSION:2.0', 'CALSCALE:GREGORIAN',
+    'PRODID:-//商机管家//CRM Reminders//CN',
+    'X-WR-CALNAME:商机管家提醒'
+  ];
+  list.forEach(r => {
+    const d = parseDateTime(r.remindAt);
+    lines.push('BEGIN:VEVENT');
+    lines.push('UID:' + r.id.replace(/[^A-Za-z0-9_-]/g, '') + '@shangji-crm');
+    lines.push('DTSTAMP:' + stamp);
+    lines.push('DTSTART:' + icsTime(d));
+    lines.push('SUMMARY:' + icsEscape('跟进提醒：' + r.text.slice(0, 80)));
+    lines.push('DESCRIPTION:' + icsEscape(r.text + '\n提醒时间：' + fmtDT(r.remindAt)));
+    lines.push('BEGIN:VALARM');
+    lines.push('TRIGGER:-PT30M');
+    lines.push('ACTION:DISPLAY');
+    lines.push('DESCRIPTION:' + icsEscape('商机管家提醒'));
+    lines.push('END:VALARM');
+    lines.push('END:VEVENT');
+  });
+  lines.push('END:VCALENDAR');
+  download(lines.join('\r\n'), '商机管家提醒_' + todayStr() + '.ics', 'text/calendar;charset=utf-8');
+  toast('已导出 ' + list.length + ' 条日历提醒（可导入手机日历）');
+}
+
+/* ==================== 渲染调度 ==================== */
+function invalidateAll(){
+  ['home','customers','opps','records','more'].forEach(p => dirtyPages.add(p));
+}
+function renderPage(name){
+  if(name === 'home') renderHome();
+  else if(name === 'customers') renderCustomers();
+  else if(name === 'opps') renderOpps();
+  else if(name === 'records') renderRecords();
+  else if(name === 'more') renderMore();
+}
+function renderActive(){
+  const p = state.page;
+  renderPage(p);
+  dirtyPages.delete(p);
+  renderGlobal();
+}
+function renderAll(){
+  ['home','customers','opps','records','more'].forEach(renderPage);
+  dirtyPages.clear();
+  renderGlobal();
+  renderSaveState();
+}
+function showPage(name){
+  if(!$('#page-' + name)) name = 'home';
+  state.page = name;
+  $$('.page').forEach(p => hide(p));
+  show($('#page-' + name));
+  $$('.tab').forEach(b => {
+    const on = b.dataset.page === name;
+    b.classList.toggle('active', on);
+    b.setAttribute('aria-current', on ? 'page' : 'false');
+  });
+  const pageEl = $('#page-' + name);
+  $('#pageTitle').textContent = pageEl.dataset.title || '商机管家';
+  $('#fab').hidden = ['home','customers','opps','records'].indexOf(name) < 0;
+  if(dirtyPages.has(name)){ renderPage(name); dirtyPages.delete(name); }
+  renderGlobal();
+  window.scrollTo(0, 0);
+  if((location.hash || '') !== '#/' + name) location.hash = '#/' + name;
+}
+
+/* ==================== 通用视图组件 ==================== */
+function statCard(label, val, sub, tone){
+  return '<div class="stat ' + (tone ? 'stat-' + tone : '') + '">' +
+    '<div class="stat-v">' + esc(String(val)) + '</div>' +
+    '<div class="stat-l">' + esc(label) + '</div>' +
+    (sub ? '<div class="stat-s">' + esc(sub) + '</div>' : '') +
+  '</div>';
+}
+function viewBar(buttons, current, groupName){
+  return '<div class="viewbar" role="group" aria-label="' + esc(groupName) + '">' +
+    buttons.map(b => '<button type="button" class="viewbtn' + (current === b[0] ? ' on' : '') +
+      '" data-view="' + b[0] + '" aria-pressed="' + (current === b[0] ? 'true' : 'false') + '">' +
+      esc(b[1]) + '</button>').join('') + '</div>';
+}
+function reminderRow(r){
+  const soon = parseDateTime(r.remindAt) && parseDateTime(r.remindAt).getTime() - Date.now() < 2 * 86400000;
+  const tone = isDue(r) ? 'tag-red' : (soon ? 'tag-orange' : 'tag-slate');
+  return '<div class="remind-row">' +
+    '<div class="remind-main"><div class="remind-text">' + esc(r.text) + '</div>' +
+    '<div class="muted">' + esc(fmtDT(r.remindAt)) + ' · ' + esc(reminderLabel(r.remindAt)) + '</div></div>' +
+    '<span class="tag ' + tone + '">' + (isDue(r) ? '已到期' : '待办') + '</span>' +
+    '<button type="button" class="mini-btn primary" data-rem-goto="' + esc(r.customerId || '') + '">去跟进</button>' +
+    '<button type="button" class="mini-btn ghost" data-rem-done="' + esc(r.id) + '">完成</button>' +
+  '</div>';
+}
+function emptyBox(text){
+  return '<div class="empty">' + esc(text) + '</div>';
+}
+function dataTable(caption, columns, rows, emptyText){
+  if(!rows.length) return emptyBox(emptyText);
+  return '<div class="table-hint" aria-hidden="true">← 左右滑动查看全部列 →</div>' +
+    '<div class="table-wrap" role="region" aria-label="' + esc(caption) + '" tabindex="0">' +
+    '<table class="data-table">' +
+      '<caption class="sr-only">' + esc(caption) + '</caption>' +
+      '<thead><tr>' + columns.map(c => '<th scope="col">' + esc(c) + '</th>').join('') + '</tr></thead>' +
+      '<tbody>' + rows.join('') + '</tbody>' +
+    '</table>' +
+  '</div>';
+}
+
+/* ==================== 首页 ==================== */
+function renderHome(){
+  const st = getStats();
+  const due = getDueReminders();
+  const soon = getReminders().filter(r => {
+    if(r.done) return false;
+    const d = parseDateTime(r.remindAt);
+    if(!d) return false;
+    const diff = d.getTime() - Date.now();
+    return diff > 0 && diff <= 7 * 86400000;
+  });
+  const recent = db.records.slice().sort((a, b) => (b.time || '').localeCompare(a.time || '')).slice(0, 5);
+  let h = '';
+
+  h += '<div class="stats-grid">' +
+    statCard('本月签单金额', fmtWanOrZero(st.monthAmt), st.monthWon + ' 单', 'green') +
+    statCard('进行中商机', st.active, '全部 ' + st.total + ' 个', 'violet') +
+    statCard('本月跟进', st.followMonth, '共 ' + db.records.length + ' 条', 'blue') +
+    statCard('成交率', st.rate + '%', '签单 ' + st.won + ' / 已结束 ' + st.closed, 'orange') +
+  '</div>';
+
+  h += '<div class="quick-actions">' +
+    '<button type="button" class="qa qa-blue" data-qa="customer"><span class="qa-ico" aria-hidden="true">👤</span>新增客户</button>' +
+    '<button type="button" class="qa qa-violet" data-qa="opp"><span class="qa-ico" aria-hidden="true">🎯</span>新增商机</button>' +
+    '<button type="button" class="qa qa-green" data-qa="record"><span class="qa-ico" aria-hidden="true">📝</span>新增跟进</button>' +
+  '</div>';
+
+  h += '<div class="table-shortcuts" aria-label="数据表">' +
+    '<button type="button" class="table-shortcut" data-goto-table="customers"><b>' + db.customers.length + '</b><span>客户表</span></button>' +
+    '<button type="button" class="table-shortcut" data-goto-table="opps"><b>' + db.opps.length + '</b><span>商机表</span></button>' +
+    '<button type="button" class="table-shortcut" data-goto-table="records"><b>' + db.records.length + '</b><span>跟进表</span></button>' +
+  '</div>';
+
+  h += '<div class="card"><div class="card-title"><span>待跟进提醒' +
+    (due.length ? '<span class="tag tag-red title-tag">' + due.length + ' 项到期</span>' : '') +
+    '</span><button type="button" class="link-btn" data-open-reminders="1">全部 ›</button></div>';
+  if(!due.length && !soon.length) h += emptyBox('🎉 暂无待办提醒');
+  due.slice(0, 8).forEach(r => { h += reminderRow(r); });
+  if(soon.length){
+    h += '<div class="card-sub">7 天内</div>';
+    soon.slice(0, 5).forEach(r => { h += reminderRow(r); });
+  }
+  if(db.reminders.some(r => !r.done)) h += '<div class="muted pad-top">只显示最近 7 天内的提醒，<button type="button" class="link-btn" data-open-reminders="1">查看全部</button></div>';
+  h += '</div>';
+
+  h += '<div class="card"><div class="card-title"><span>最近跟进</span>' +
+    '<button type="button" class="link-btn" data-goto-records="1">全部 ›</button></div>';
+  if(!recent.length) h += emptyBox('还没有跟进记录');
+  recent.forEach(r => {
+    h += '<button type="button" class="mini-follow" data-open-rec="' + esc(r.id) + '">' +
+      '<span class="type-badge">' + esc(r.type) + '</span>' +
+      '<span class="mini-follow-text">' + esc(custName(r.customerId)) + '：' + esc(String(r.content).slice(0, 26)) + '</span>' +
+      '<span class="muted">' + esc((r.time || '').slice(0, 10)) + '</span>' +
+    '</button>';
+  });
+  h += '</div>';
+
+  $('#page-home').innerHTML = h;
+}
+
+/* ==================== 客户 ==================== */
+function customerRows(list){
+  return list.map(c => {
+    const opps = db.opps.filter(o => o.customerId === c.id);
+    const activeN = opps.filter(o => o.stage !== 'deal' && o.status === '进行中').length;
+    const lvl = LEVELS.find(l => l[0] === c.level) || LEVELS[1];
+    return {
+      c: c, activeN: activeN, lvl: lvl,
+      tags: (activeN ? '<span class="tag tag-blue">' + activeN + ' 个商机</span>' : '') +
+        (c.lastFollowAt ? '<span class="tag tag-slate">最近跟进 ' + esc(String(c.lastFollowAt).slice(0, 10)) + '</span>'
+                        : '<span class="tag tag-red">从未跟进</span>') +
+        (c.owner ? '<span class="tag tag-slate">' + esc(c.owner) + '</span>' : '')
+    };
+  });
+}
+function renderCustomers(){
+  const q = state.custQuery.trim().toLowerCase();
+  let list = db.customers.slice();
+  if(q){
+    list = list.filter(c =>
+      [c.name, c.contact, c.phone, c.wechat, c.code, c.address, c.remark]
+        .join(' ').toLowerCase().includes(q));
+  }
+  list.sort((a, b) => (b.lastFollowAt || '').localeCompare(a.lastFollowAt || ''));
+
+  const el = $('#custList');
+  const bar = $('#custViewBar');
+  if(bar) bar.innerHTML = viewBar([['list','卡片'],['table','表格']], state.custView, '客户视图');
+
+  if(!list.length){
+    el.innerHTML = emptyBox(q ? '没有匹配的客户' : '还没有客户，点右下角 + 添加');
+    return;
+  }
+  if(state.custView === 'table'){
+    const rows = customerRows(list).map(x => {
+      const c = x.c;
+      return '<tr data-open="' + esc(c.id) + '" tabindex="0">' +
+        '<td class="nowrap">' + esc(c.code || '—') + '</td>' +
+        '<td><b>' + esc(c.name) + '</b><span class="lvl lvl-' + x.lvl[0] + '">' + x.lvl[0] + '</span></td>' +
+        '<td>' + esc(c.industry || '—') + '</td>' +
+        '<td>' + esc(c.contact || '—') + (c.position ? '<span class="muted"> · ' + esc(c.position) + '</span>' : '') + '</td>' +
+        '<td class="nowrap">' + esc(c.phone || '—') + '</td>' +
+        '<td>' + esc(c.owner || '—') + '</td>' +
+        '<td class="nowrap">' + esc(c.lastFollowAt ? String(c.lastFollowAt).slice(0, 10) : '从未') + '</td>' +
+        '<td class="num">' + x.activeN + '</td>' +
+      '</tr>';
+    });
+    el.innerHTML = dataTable('客户表', ['编号','客户名称','行业','联系人','电话','负责人','最近跟进','进行中商机'], rows, '没有匹配的客户');
+    return;
+  }
+  el.innerHTML = customerRows(list).map(x => {
+    const c = x.c;
+    return '<div class="item" data-open="' + esc(c.id) + '" tabindex="0">' +
+      '<div class="cust-top">' +
+        '<div class="avatar" aria-hidden="true">' + esc((c.name || '?').slice(0, 1)) + '</div>' +
+        '<div class="cust-info">' +
+          '<div class="cust-name">' + esc(c.name) + '<span class="lvl lvl-' + x.lvl[0] + '">' + x.lvl[0] + '</span>' +
+          '<span class="code-tag">' + esc(c.code || '') + '</span></div>' +
+          '<div class="cust-sub">' + esc([c.industry, c.contact, c.phone].filter(Boolean).join(' · ') || '未填写详细信息') + '</div>' +
+        '</div>' +
+        '<div class="cust-arrow" aria-hidden="true">›</div>' +
+      '</div>' +
+      '<div class="cust-tags">' + x.tags + '</div>' +
+    '</div>';
+  }).join('');
+}
+
+/* ==================== 商机 ==================== */
+function oppStatusTag(o){
+  return o.status !== '进行中' ?
+    '<span class="tag ' + (o.status === '丢单' ? 'tag-red' : 'tag-slate') + '">' + esc(o.status) + '</span>' : '';
+}
+function oppListItem(o){
+  const s = stageById(o.stage);
+  let btns = '';
+  if(s.id !== 'deal' && o.status !== '丢单') btns += '<button type="button" class="mini-btn primary" data-next="' + esc(o.id) + '">下一阶段</button>';
+  if(s.id !== 'lead') btns += '<button type="button" class="mini-btn ghost" data-prev="' + esc(o.id) + '">上一阶段</button>';
+  return '<div class="item" data-opp="' + esc(o.id) + '" tabindex="0">' +
+    '<div class="opp-top"><span class="st-badge ' + s.cls + '">' + s.name + '</span>' +
+    '<span class="opp-name">' + esc(o.name) + '</span>' + oppStatusTag(o) + '</div>' +
+    '<div class="opp-cust">' + esc(custName(o.customerId)) + ' · ' + esc(o.code || '') + '</div>' +
+    '<div class="opp-meta">' +
+      '<span class="opp-amt">' + fmtWan(o.amount) + '</span>' +
+      (o.expectDate ? '<span class="tag tag-slate">预计 ' + esc(o.expectDate) + '</span>' : '') +
+      (o.category ? '<span class="tag tag-blue">' + esc(o.category) + '</span>' : '') +
+      '<span class="tag tag-slate">' + esc(o.owner || '我') + '</span>' +
+    '</div>' +
+    '<div class="opp-foot"><div class="opp-btns">' + btns + '</div></div>' +
+  '</div>';
+}
+function kanbanCard(o){
+  return '<div class="kanban-card" data-opp="' + esc(o.id) + '">' +
+    '<div class="kanban-card-top">' +
+      '<span class="drag-grip" data-drag="' + esc(o.id) + '" title="按住拖拽换阶段" aria-label="拖拽移动商机">⠿</span>' +
+      '<span class="kanban-card-name">' + esc(o.name) + '</span>' +
+    '</div>' +
+    '<div class="kanban-card-cust">' + esc(custName(o.customerId)) + '</div>' +
+    '<div class="kanban-card-meta"><span class="kanban-amt">' + fmtWan(o.amount) + '</span>' + oppStatusTag(o) + '</div>' +
+    (o.expectDate ? '<div class="kanban-date">预计 ' + esc(o.expectDate) + '</div>' : '') +
+  '</div>';
+}
+function renderOpps(){
+  const bar = $('#oppViewBar');
+  bar.innerHTML = viewBar([['kanban','看板'],['list','列表'],['table','表格']], state.oppView, '商机视图');
+  const chips = $('#oppStageChips');
+  chips.hidden = state.oppView === 'kanban';
+  const kanban = $('#oppKanban');
+  const listEl = $('#oppList');
+  kanban.hidden = state.oppView !== 'kanban';
+  listEl.hidden = state.oppView === 'kanban';
+
+  const q = state.oppQuery.trim().toLowerCase();
+  let base = db.opps.slice();
+  if(q) base = base.filter(o => ((o.name || '') + ' ' + custName(o.customerId)).toLowerCase().includes(q));
+
+  if(state.oppView === 'kanban'){
+    kanban.innerHTML = '<div class="kanban">' + STAGES.map(s => {
+      const cards = base.filter(o => o.stage === s.id);
+      let body = '';
+      cards.forEach(o => { body += kanbanCard(o); });
+      if(!cards.length) body += '<div class="kanban-empty">拖拽卡片到这里</div>';
+      return '<div class="kanban-col" data-stage="' + s.id + '">' +
+        '<div class="kanban-head"><span class="kanban-title ' + s.cls + '">' + s.name + '</span><b>' + cards.length + '</b></div>' +
+        '<div class="kanban-body">' + body + '</div>' +
+      '</div>';
+    }).join('') + '</div>';
+    listEl.innerHTML = '';
+    return;
+  }
+
+  kanban.innerHTML = '';
+  chips.innerHTML = [['all', '全部']].concat(STAGES.map(s => [s.id, s.name])).map(pair => {
+    const id = pair[0], name = pair[1];
+    const n = id === 'all' ? db.opps.length : db.opps.filter(o => o.stage === id).length;
+    return '<button type="button" class="chip' + (state.oppStage === id ? ' active' : '') +
+      '" data-stage="' + id + '" aria-pressed="' + (state.oppStage === id ? 'true' : 'false') + '">' +
+      name + '<i>' + n + '</i></button>';
+  }).join('');
+
+  let list = base;
+  if(state.oppStage !== 'all') list = list.filter(o => o.stage === state.oppStage);
+  list.sort((a, b) => (b.updatedAt || '').localeCompare(a.updatedAt || ''));
+  if(!list.length){
+    listEl.innerHTML = emptyBox('暂无商机，点右下角 + 添加');
+    return;
+  }
+  if(state.oppView === 'table'){
+    const rows = list.map(o => {
+      const s = stageById(o.stage);
+      return '<tr data-opp="' + esc(o.id) + '" tabindex="0">' +
+        '<td class="nowrap">' + esc(o.code || '—') + '</td>' +
+        '<td><b>' + esc(o.name) + '</b></td>' +
+        '<td>' + esc(custName(o.customerId)) + '</td>' +
+        '<td><span class="st-badge ' + s.cls + '">' + s.name + '</span></td>' +
+        '<td class="num nowrap">' + fmtWan(o.amount) + '</td>' +
+        '<td class="nowrap">' + esc(o.expectDate || '—') + '</td>' +
+        '<td>' + (oppStatusTag(o) || '<span class="tag tag-slate">进行中</span>') + '</td>' +
+        '<td>' + esc(o.owner || '我') + '</td>' +
+        '<td class="nowrap muted">' + esc(String(o.updatedAt || '').slice(0, 16)) + '</td>' +
+      '</tr>';
+    });
+    listEl.innerHTML = dataTable('商机表', ['编号','商机名称','客户','阶段','预估金额','预计成交','状态','负责人','更新'], rows, '暂无商机');
+    return;
+  }
+  listEl.innerHTML = list.map(oppListItem).join('');
+}
+
+/* ==================== 跟进记录 ==================== */
+function recordCard(r){
+  const o = r.oppId ? oppById(r.oppId) : null;
+  const photos = r.photos || [];
+  let photoHtml = '';
+  if(photos.length){
+    const shown = photos.slice(0, 4);
+    photoHtml = '<div class="photo-grid">' + shown.map((pid, i) => {
+      const src = photoSrc(pid);
+      return src
+        ? '<button type="button" class="photo-thumb-btn" data-img="' + esc(r.id) + '|' + i + '" aria-label="查看第 ' + (i+1) + ' 张照片">' +
+            '<img class="photo-thumb" src="' + esc(src) + '" alt="拜访照片 ' + (i+1) + '"></button>'
+        : '<span class="photo-thumb missing" title="照片数据缺失">缺失</span>';
+    }).join('') +
+      (photos.length > 4 ? '<button type="button" class="photo-more" data-img-more="' + esc(r.id) + '" aria-label="查看其余 ' + (photos.length - 4) + ' 张照片">+' + (photos.length - 4) + '</button>' : '') +
+    '</div>';
+  }
+  const rem = findReminderForRecord(r.id);
+  const remDone = rem ? rem.done : false;
+  let remind = '';
+  if(r.remindAt){
+    const cls = remDone ? 'tag-slate' : (isDue({remindAt:r.remindAt, done:false}) ? 'tag-red' : 'tag-orange');
+    remind = '<span class="tag ' + cls + '">' + (remDone ? '已完成 ' : '提醒 ') + esc(fmtDT(r.remindAt)) + '</span>';
+  }
+  return '<div class="item tl-item" data-rec="' + esc(r.id) + '" tabindex="0">' +
+    '<div class="tl-dot" aria-hidden="true"></div>' +
+    '<div class="rec-head"><span class="type-badge">' + esc(r.type) + '</span>' +
+    '<span class="rec-cust">' + esc(custName(r.customerId)) + (o ? ' <em>· ' + esc(o.name) + '</em>' : '') + '</span></div>' +
+    '<div class="rec-time muted">' + esc(fmtDT(r.time)) + (r.owner ? ' · ' + esc(r.owner) : '') + '</div>' +
+    '<div class="rec-content">' + esc(r.content) + '</div>' +
+    (r.feedback ? '<div class="rec-sub"><b>客户反馈：</b>' + esc(r.feedback) + '</div>' : '') +
+    (r.nextPlan ? '<div class="rec-sub"><b>下次计划：</b>' + esc(r.nextPlan) + '</div>' : '') +
+    photoHtml +
+    (remind ? '<div class="rec-foot">' + remind + '</div>' : '') +
+  '</div>';
+}
+function renderRecords(){
+  const bar = $('#recViewBar');
+  if(bar) bar.innerHTML = viewBar([['timeline','时间线'],['table','表格']], state.recView, '跟进视图');
+  const chips = $('#recTypeChips');
+  chips.innerHTML = [['all', '全部']].concat(FOLLOW_TYPES.map(t => [t, t])).map(pair => {
+    const id = pair[0], name = pair[1];
+    const n = id === 'all' ? db.records.length : db.records.filter(r => r.type === id).length;
+    return '<button type="button" class="chip' + (state.recType === id ? ' active' : '') +
+      '" data-type="' + id + '" aria-pressed="' + (state.recType === id ? 'true' : 'false') + '">' +
+      name + '<i>' + n + '</i></button>';
+  }).join('');
+
+  let list = db.records.slice();
+  if(state.recType !== 'all') list = list.filter(r => r.type === state.recType);
+  const q = state.recQuery.trim().toLowerCase();
+  if(q) list = list.filter(r => ((r.content || '') + ' ' + (r.feedback || '') + ' ' + (r.nextPlan || '') + ' ' + custName(r.customerId)).toLowerCase().includes(q));
+  list.sort((a, b) => (b.time || '').localeCompare(a.time || ''));
+  const el = $('#recList');
+  if(!list.length){
+    el.innerHTML = emptyBox(q ? '没有匹配的记录' : '暂无跟进记录，点右下角 + 添加');
+    return;
+  }
+  if(state.recView === 'table'){
+    const rows = list.map(r => {
+      const o = r.oppId ? oppById(r.oppId) : null;
+      return '<tr data-rec="' + esc(r.id) + '" tabindex="0">' +
+        '<td class="nowrap">' + esc(fmtDT(r.time)) + '</td>' +
+        '<td><b>' + esc(custName(r.customerId)) + '</b>' + (o ? '<span class="muted"> · ' + esc(o.name) + '</span>' : '') + '</td>' +
+        '<td>' + esc(r.type) + '</td>' +
+        '<td class="cell-wide">' + esc(r.content) + '</td>' +
+        '<td class="nowrap">' + esc(r.remindAt ? fmtDT(r.remindAt) : '—') + '</td>' +
+        '<td class="num">' + (r.photos || []).length + '</td>' +
+        '<td>' + esc(r.owner || '我') + '</td>' +
+      '</tr>';
+    });
+    el.innerHTML = dataTable('跟进记录表', ['跟进时间','客户 / 商机','类型','跟进内容','下次提醒','照片','跟进人'], rows, '暂无跟进记录');
+    return;
+  }
+  el.innerHTML = list.map(recordCard).join('');
+}
+
+/* ==================== 我的 ==================== */
+function renderMore(){
+  const st = getStats();
+  const me = db.settings.me || '我';
+  const exportText = db.settings.lastExportAt ? fmtDT(db.settings.lastExportAt) : '从未导出';
+  const notif = notificationSupported() ? (Notification.permission === 'granted' ? '已开启' : (Notification.permission === 'denied' ? '已拒绝（需到浏览器设置修改）' : '未开启')) : '当前环境不支持';
+  const sw = runtime.swStatus === 'ready' ? '已启用（可离线打开）' :
+    (runtime.swStatus === 'none' ? '未启用（缺少 sw.js 或浏览器限制）' :
+      (location.protocol.startsWith('http') ? '注册中…' : '本地文件模式，不可用'));
+  const help = state.helpOpen;
+  $('#moreBody').innerHTML =
+    '<div class="card"><div class="card-title">成交统计</div>' +
+      '<div class="kv"><span>本月签单金额</span><b>' + fmtWanOrZero(st.monthAmt) + '（' + st.monthWon + ' 单）</b></div>' +
+      '<div class="kv"><span>累计签单金额</span><b>' + fmtWanOrZero(st.totalAmt) + '（' + st.won + ' 单）</b></div>' +
+      '<div class="kv"><span>商机总数 / 进行中</span><b>' + st.total + ' / ' + st.active + '</b></div>' +
+      '<div class="kv"><span>成交率（签单 ÷ 已结束）</span><b>' + st.rate + '%（' + st.won + ' / ' + st.closed + '）</b></div>' +
+      '<div class="kv"><span>客户 / 跟进记录</span><b>' + db.customers.length + ' / ' + db.records.length + '</b></div>' +
+    '</div>' +
+
+    '<div class="card"><div class="card-title">数据安全</div>' +
+      '<div class="kv"><span>上次导出备份</span><b>' + esc(exportText) + '</b></div>' +
+      '<div class="kv"><span>照片存储</span><b>' + (photoMode === 'idb' ? ('IndexedDB · ' + photoCount() + ' 张') : '不可用') + '</b></div>' +
+      '<button type="button" class="row-btn" data-act="export"><span>💾</span>导出完整备份（JSON，含照片）<em>›</em></button>' +
+      '<button type="button" class="row-btn" data-act="import"><span>📥</span>导入备份（覆盖当前数据）<em>›</em></button>' +
+      '<button type="button" class="row-btn" data-act="snapshots"><span>🕘</span>自动快照与恢复<em>›</em></button>' +
+      '<button type="button" class="row-btn" data-act="ics"><span>📅</span>导出提醒到手机日历（.ics）<em>›</em></button>' +
+      '<button type="button" class="row-btn" data-act="notify"><span>🔔</span>浏览器通知：' + esc(notif) + '<em>›</em></button>' +
+      '<p class="hint">数据默认只存在本机浏览器。清理缓存、换手机、换浏览器都会丢失；建议每周导出一次备份。</p>' +
+    '</div>' +
+
+    '<div class="card"><div class="card-title">表格导出（CSV）</div>' +
+      '<button type="button" class="row-btn" data-act="csv-c"><span>📊</span>客户表（' + db.customers.length + ' 行）<em>›</em></button>' +
+      '<button type="button" class="row-btn" data-act="csv-o"><span>📊</span>商机表（' + db.opps.length + ' 行）<em>›</em></button>' +
+      '<button type="button" class="row-btn" data-act="csv-r"><span>📊</span>跟进记录表（' + db.records.length + ' 行，不含照片）<em>›</em></button>' +
+      '<p class="hint">CSV 已做公式注入防护；用 Excel / WPS 打开即可。</p>' +
+    '</div>' +
+
+    '<div class="card"><div class="card-title">成员设置</div>' +
+      '<div class="kv"><span>当前操作人</span><b>' + esc(me) + '</b></div>' +
+      '<div class="member-list">' + db.settings.members.map(m =>
+        '<span class="member-chip' + (m === me ? ' me' : '') + '">' + esc(m) + '</span>').join('') + '</div>' +
+      '<button type="button" class="row-btn" data-act="members"><span>👥</span>管理成员（负责人可选）<em>›</em></button>' +
+    '</div>' +
+
+    '<div class="card"><div class="card-title">诊断与帮助</div>' +
+      '<button type="button" class="row-btn" data-act="diag"><span>🩺</span>查看诊断信息<em>›</em></button>' +
+      '<button type="button" class="row-btn" data-act="demo"><span>🧪</span>载入示例数据<em>›</em></button>' +
+      '<details class="help" data-help="usage"' + (help.usage ? ' open' : '') + '><summary>怎么用？（门店/项目型销售）</summary><div class="help-body">' +
+        '1）在「客户」录入客户；2）在「商机」新建项目并推进阶段（线索→需求→意向→方案→报价→投标→签单）；' +
+        '3）每次电话/微信/拜访后到「跟进」记录内容，并设置下次跟进提醒；4）首页显示逾期和近期提醒；' +
+        '5）签单时填写成交金额，首页/我的自动统计签单金额与成交率。</div></details>' +
+      '<details class="help" data-help="storage"' + (help.storage ? ' open' : '') + '><summary>数据到底存在哪里？</summary><div class="help-body">' +
+        '客户、商机、跟进等文字保存在浏览器 localStorage；拜访照片保存在 IndexedDB，不占用 5MB 文字配额，也不会上传服务器。' +
+        '换手机/换浏览器/清缓存会丢失，请定期「导出完整备份」，换设备时用「导入备份」恢复。</div></details>' +
+      '<details class="help" data-help="offline"' + (help.offline ? ' open' : '') + '><summary>为什么有时打不开 / 能否离线？</summary><div class="help-body">' +
+        'GitHub Pages 必须上传完整部署包（index.html + sw.js + manifest + icons）才能启用离线缓存；' +
+        '只上传 index.html 也能正常使用，但断网时依赖浏览器缓存。离线状态：' + esc(sw) + '。</div></details>' +
+      '<details class="help" data-help="privacy"' + (help.privacy ? ' open' : '') + '><summary>隐私提醒：同一 GitHub 账号下的其他页面</summary><div class="help-body">' +
+        'github.io 是共享域名，同一账号下所有仓库页面属于同一个浏览器源，技术上可读取本应用的 localStorage。' +
+        '如果有其他不受信任的页面部署在同一账号下，建议为本应用单独建一个账号/组织，或绑定独立域名。' +
+        '本应用自身没有任何网络请求，不会主动外传数据。</div></details>' +
+    '</div>' +
+
+    '<div class="card"><div class="card-title">危险操作</div>' +
+      '<button type="button" class="row-btn danger" data-act="clear"><span>🗑️</span>清空全部数据（含照片）<em>›</em></button>' +
+    '</div>' +
+
+    '<div class="about">商机管家 ' + esc(APP_VERSION) + ' · 构建 ' + esc(BUILD_LABEL) +
+      ' · ' + esc(BUILD_TIME_LABEL) + '<br>数据仅存本机浏览器 · schema v' + SCHEMA_VERSION + '</div>';
+}
+
+/* ==================== 弹窗基础 ==================== */
+function focusableIn(root){
+  return Array.from(root.querySelectorAll(
+    'a[href],button:not([disabled]),input:not([disabled]):not([type="hidden"]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])'
+  )).filter(el => el.offsetParent !== null);
+}
+function openModal(html, opts){
+  const options = opts || {};
+  if(runtime.modalOpen) closeModal(true);
+  runtime.lastFocus = document.activeElement;
+  runtime.modalOnClose = options.onClose || null;
+  const box = $('#modalBox');
+  box.innerHTML = '<button type="button" class="modal-x" data-close aria-label="关闭对话框">×</button>' + html;
+  box.setAttribute('role', 'dialog');
+  box.setAttribute('aria-modal', 'true');
+  const head = box.querySelector('.modal-head');
+  box.setAttribute('aria-label', options.label || (head ? head.textContent.trim().slice(0, 60) : '对话框'));
+  show($('#modalBackdrop'));
+  show($('#modalWrap'));
+  box.scrollTop = 0;
+  runtime.modalOpen = true;
+  document.body.classList.add('modal-open');
+  setTimeout(function(){
+    if(!runtime.modalOpen) return;
+    const first = box.querySelector('[autofocus]') || focusableIn(box).filter(el => !el.classList.contains('modal-x'))[0];
+    if(first) try{ first.focus(); }catch(e){}
+  }, 40);
+}
+function closeModal(silent){
+  if(!runtime.modalOpen) return;
+  runtime.modalOpen = false;
+  hide($('#modalWrap'));
+  hide($('#modalBackdrop'));
+  $('#modalBox').innerHTML = '';
+  document.body.classList.remove('modal-open');
+  const cb = runtime.modalOnClose;
+  runtime.modalOnClose = null;
+  if(cb){ try{ cb(); }catch(e){} }
+  if(!silent && runtime.lastFocus && document.contains(runtime.lastFocus)){
+    try{ runtime.lastFocus.focus(); }catch(e){}
+  }
+  runtime.lastFocus = null;
+}
+function confirmDlg(opts){
+  openModal(
+    '<div class="modal-head">' + esc(opts.title || '确认') + '</div>' +
+    '<div class="confirm-msg">' + esc(opts.msg || '') + '</div>' +
+    '<div class="form-btns">' +
+      '<button type="button" class="btn ghost" data-close>取消</button>' +
+      '<button type="button" class="btn ' + (opts.danger ? 'danger' : 'primary') + '" id="confirmOk">' + esc(opts.okText || '确定') + '</button>' +
+    '</div>'
+  );
+  const btn = $('#confirmOk');
+  btn.addEventListener('click', async function(){
+    btn.disabled = true;
+    btn.textContent = '处理中…';
+    closeModal(true);
+    try{
+      if(opts.onOk) await opts.onOk();
+    }catch(e){
+      toast('操作失败：' + (e && e.message ? e.message : e));
+    }
+  });
+}
+function handleModalKeydown(e){
+  if(!runtime.modalOpen) return;
+  if(e.key === 'Escape'){ e.preventDefault(); closeModal(); return; }
+  if(e.key !== 'Tab') return;
+  const box = $('#modalBox');
+  const f = focusableIn(box);
+  if(!f.length) return;
+  const first = f[0], last = f[f.length - 1];
+  if(e.shiftKey && document.activeElement === first){ e.preventDefault(); last.focus(); }
+  else if(!e.shiftKey && document.activeElement === last){ e.preventDefault(); first.focus(); }
+}
+
+/* ==================== 照片查看 ==================== */
+let viewerState = null;
+function openImageView(recId, idx){
+  const r = db.records.find(x => x.id === recId);
+  if(!r || !(r.photos || []).length) return;
+  viewerState = {recId: recId, idx: Math.max(0, Math.min(idx || 0, r.photos.length - 1))};
+  renderViewer();
+}
+function renderViewer(){
+  if(!viewerState) return;
+  const r = db.records.find(x => x.id === viewerState.recId);
+  if(!r || !(r.photos || []).length){ viewerState = null; return; }
+  const ids = r.photos;
+  const i = Math.max(0, Math.min(viewerState.idx, ids.length - 1));
+  viewerState.idx = i;
+  const src = photoSrc(ids[i]);
+  const thumbs = ids.map((pid, n) => {
+    const s = photoSrc(pid);
+    return '<button type="button" class="pv-thumb' + (n === i ? ' on' : '') + '" data-pv-thumb="' + n + '" aria-label="第 ' + (n+1) + ' 张">' +
+      (s ? '<img src="' + esc(s) + '" alt="">' : '<span>缺失</span>') + '</button>';
+  }).join('');
+  openModal(
+    '<div class="modal-head">拜访照片 <span class="muted">' + (i+1) + ' / ' + ids.length + '</span></div>' +
+    (src
+      ? '<img class="full-img" src="' + esc(src) + '" alt="拜访照片 ' + (i+1) + '">'
+      : '<div class="empty">照片数据缺失（可能是在别的设备拍摄，未随备份导入）</div>') +
+    '<div class="pv-nav">' +
+      '<button type="button" class="btn ghost" data-pv-prev="1"' + (i === 0 ? ' disabled' : '') + '>‹ 上一张</button>' +
+      '<button type="button" class="btn ghost" data-pv-next="1"' + (i === ids.length-1 ? ' disabled' : '') + '>下一张 ›</button>' +
+    '</div>' +
+    '<div class="pv-thumbs">' + thumbs + '</div>' +
+    '<div class="form-btns"><button type="button" class="btn ghost" data-close>关闭</button></div>'
+  );
+  $$('#modalBox [data-pv-prev]').forEach(b => b.addEventListener('click', () => { viewerState.idx--; renderViewer(); }));
+  $$('#modalBox [data-pv-next]').forEach(b => b.addEventListener('click', () => { viewerState.idx++; renderViewer(); }));
+  $$('#modalBox [data-pv-thumb]').forEach(b => b.addEventListener('click', () => {
+    viewerState.idx = Number(b.dataset.pvThumb);
+    renderViewer();
+  }));
+}
+function viewerKey(e){
+  if(!viewerState || !runtime.modalOpen) return;
+  if(!$('#modalBox .pv-thumbs')){ viewerState = null; return; }
+  if(e.key === 'ArrowLeft' && viewerState.idx > 0){ e.preventDefault(); viewerState.idx--; renderViewer(); }
+  if(e.key === 'ArrowRight'){
+    const r = db.records.find(x => x.id === viewerState.recId);
+    if(r && viewerState.idx < r.photos.length - 1){ e.preventDefault(); viewerState.idx++; renderViewer(); }
+  }
+}
+
+/* ==================== 图片压缩 ==================== */
+function compressImage(file){
+  return new Promise((resolve, reject) => {
+    if(!file || !file.type || file.type.indexOf('image/') !== 0){ reject(new Error('不是图片文件')); return; }
+    if(/heic|heif/i.test(file.type)){ reject(new Error('HEIC 格式浏览器无法读取，请先转为 JPG')); return; }
+    if(file.size > PHOTO_MAX_BYTES){ reject(new Error('图片超过 25MB')); return; }
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = function(){
+      try{
+        URL.revokeObjectURL(url);
+        let w = img.naturalWidth || img.width;
+        let h = img.naturalHeight || img.height;
+        if(!w || !h) throw new Error('图片尺寸无效');
+        const scale = Math.min(1, PHOTO_EDGE / Math.max(w, h));
+        w = Math.max(1, Math.round(w * scale));
+        h = Math.max(1, Math.round(h * scale));
+        const canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        const ctx = canvas.getContext('2d');
+        if(!ctx) throw new Error('浏览器不支持图片处理');
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, w, h);
+        ctx.drawImage(img, 0, 0, w, h);
+        const dataUrl = canvas.toDataURL('image/jpeg', PHOTO_QUALITY);
+        if(!safeDataUrl(dataUrl)) throw new Error('照片压缩失败');
+        resolve(dataUrl);
+      }catch(e){
+        reject(e);
+      }
+    };
+    img.onerror = function(){
+      URL.revokeObjectURL(url);
+      reject(new Error('图片解码失败（格式不支持或文件损坏）'));
+    };
+    img.src = url;
+  });
+}
+
+/* ==================== 成员/负责人 ==================== */
+function memberOptions(selected){
+  const list = db.settings.members.slice();
+  const sel = selected || db.settings.me || '我';
+  if(sel && list.indexOf(sel) < 0) list.unshift(sel);
+  return list.map(m =>
+    '<option value="' + esc(m) + '"' + (sel === m ? ' selected' : '') + '>' +
+    esc(m) + (db.settings.members.indexOf(m) < 0 ? '（已移除）' : '') + '</option>'
+  ).join('');
+}
+function openMemberSettings(){
+  const s = db.settings;
+  openModal(
+    '<div class="modal-head">成员管理</div>' +
+    '<div class="muted modal-sub">添加同事姓名后，客户 / 商机 / 跟进里的「负责人」可下拉选择。删除成员不会改写历史记录。</div>' +
+    '<div class="member-list">' + s.members.map((m, i) =>
+      '<span class="member-chip' + (m === s.me ? ' me' : '') + '">' + esc(m) +
+      (s.members.length > 1 ? ' <button type="button" class="member-del" data-del-member="' + i + '" aria-label="删除成员 ' + esc(m) + '">×</button>' : '') +
+      '</span>').join('') + '</div>' +
+    '<div class="field field-top"><label for="f-member">添加成员</label>' +
+      '<input id="f-member" maxlength="20" placeholder="如：李经理" autocomplete="off"></div>' +
+    '<div class="field"><label for="f-me">当前操作人</label><select id="f-me">' +
+      s.members.map(m => '<option value="' + esc(m) + '"' + (m === s.me ? ' selected' : '') + '>' + esc(m) + '</option>').join('') +
+    '</select></div>' +
+    '<div class="form-btns"><button type="button" class="btn ghost" data-close>取消</button>' +
+    '<button type="button" class="btn primary" id="f-member-add">添加</button></div>'
+  );
+  $('#f-member-add').addEventListener('click', () => {
+    const v = $('#f-member').value.trim().slice(0, 40);
+    if(!v){ toast('请输入成员姓名'); return; }
+    if(db.settings.members.indexOf(v) >= 0){ toast('该成员已存在'); return; }
+    if(db.settings.members.length >= 30){ toast('成员最多 30 人'); return; }
+    db.settings.members.push(v);
+    commit('已添加成员' + v);
+    closeModal();
+    openMemberSettings();
+  });
+  $$('#modalBox [data-del-member]').forEach(b => b.addEventListener('click', () => {
+    const i = Number(b.dataset.delMember);
+    const name = db.settings.members[i];
+    if(db.settings.members.length <= 1){ toast('至少保留一位成员'); return; }
+    confirmDlg({
+      title: '删除成员',
+      msg: '确定删除「' + name + '」？历史客户/商机里的负责人不会被改写；之后编辑时可重新选择。',
+      okText: '删除', danger: true,
+      onOk: () => {
+        db.settings.members.splice(i, 1);
+        if(db.settings.me === name) db.settings.me = db.settings.members[0] || '我';
+        commit('已删除成员');
+        closeModal(true);
+        openMemberSettings();
+      }
+    });
+  }));
+  $('#f-me').addEventListener('change', e => {
+    db.settings.me = e.target.value;
+    commit('当前操作人已切换');
+    renderAll();
+  });
+}
+
+/* ==================== 客户表单 ==================== */
+function openCustomerForm(cust){
+  const c = cust || {};
+  openModal(
+    '<div class="modal-head">' + (cust ? '编辑客户' : '新增客户') + '</div>' +
+    '<form id="custForm" novalidate>' +
+      '<div class="field"><label for="f-cname">客户名称 <i class="req">*</i></label>' +
+        '<input id="f-cname" required maxlength="120" placeholder="如：华信科技园区" value="' + esc(c.name || '') + '" autocomplete="off"></div>' +
+      '<div class="field"><label for="f-industry">行业</label><select id="f-industry">' +
+        INDUSTRIES.map(i => '<option' + (c.industry === i ? ' selected' : '') + '>' + i + '</option>').join('') +
+        '</select></div>' +
+      '<div class="field"><label for="f-address">客户地址</label>' +
+        '<input id="f-address" maxlength="300" placeholder="详细地址" value="' + esc(c.address || '') + '" autocomplete="off"></div>' +
+      '<div class="field"><label for="f-contact">联系人</label>' +
+        '<input id="f-contact" maxlength="60" placeholder="姓名" value="' + esc(c.contact || '') + '" autocomplete="off"></div>' +
+      '<div class="field"><label for="f-position">职位</label>' +
+        '<input id="f-position" maxlength="60" placeholder="如：项目经理" value="' + esc(c.position || '') + '" autocomplete="off"></div>' +
+      '<div class="field"><label for="f-phone">联系电话</label>' +
+        '<input id="f-phone" type="tel" inputmode="tel" maxlength="40" placeholder="手机号" value="' + esc(c.phone || '') + '" autocomplete="off"></div>' +
+      '<div class="field"><label for="f-wechat">微信</label>' +
+        '<input id="f-wechat" maxlength="60" placeholder="微信号" value="' + esc(c.wechat || '') + '" autocomplete="off"></div>' +
+      '<div class="field"><label for="f-email">邮箱</label>' +
+        '<input id="f-email" type="email" inputmode="email" maxlength="120" placeholder="邮箱" value="' + esc(c.email || '') + '" autocomplete="off"></div>' +
+      '<div class="field"><label for="f-source">公司来源</label><select id="f-source">' +
+        SOURCES.map(i => '<option' + (c.source === i ? ' selected' : '') + '>' + i + '</option>').join('') +
+        '</select></div>' +
+      '<div class="field"><label for="f-owner">负责人（销售）</label><select id="f-owner">' + memberOptions(c.owner) + '</select></div>' +
+      '<div class="field"><label for="f-level">客户等级</label><select id="f-level">' +
+        LEVELS.map(l => '<option value="' + l[0] + '"' + ((c.level || 'B') === l[0] ? ' selected' : '') + '>' + esc(l[1]) + '</option>').join('') +
+        '</select></div>' +
+      '<div class="field"><label for="f-cremark">备注</label>' +
+        '<textarea id="f-cremark" rows="3" maxlength="3000" placeholder="客户情况、决策链、注意事项…">' + esc(c.remark || '') + '</textarea></div>' +
+      '<div class="form-btns">' +
+        (cust ? '<button type="button" class="btn ghost danger-text" id="f-cdel">删除</button>' : '') +
+        '<div class="spacer"></div>' +
+        '<button type="button" class="btn ghost" data-close>取消</button>' +
+        '<button type="submit" class="btn primary">保存</button>' +
+      '</div>' +
+    '</form>'
+  );
+  if(cust){
+    $('#f-cdel').addEventListener('click', () => {
+      closeModal();
+      confirmDlg({
+        title: '删除客户',
+        msg: '将同时删除该客户的全部商机、跟进记录、照片和提醒。此操作无法撤销，确定删除？',
+        okText: '删除', danger: true,
+        onOk: () => deleteCustomer(cust.id)
+      });
+    });
+  }
+  $('#custForm').addEventListener('submit', ev => {
+    ev.preventDefault();
+    const name = $('#f-cname').value.trim();
+    if(!name){ toast('请填写客户名称'); $('#f-cname').focus(); return; }
+    const data = {
+      name: name,
+      industry: $('#f-industry').value,
+      address: $('#f-address').value.trim(),
+      contact: $('#f-contact').value.trim(),
+      position: $('#f-position').value.trim(),
+      phone: $('#f-phone').value.trim(),
+      wechat: $('#f-wechat').value.trim(),
+      email: $('#f-email').value.trim(),
+      source: $('#f-source').value,
+      owner: $('#f-owner').value || db.settings.me || '我',
+      level: $('#f-level').value,
+      remark: $('#f-cremark').value.trim()
+    };
+    let saved;
+    if(cust){
+      Object.assign(cust, data);
+      saved = cust;
+    }else{
+      saved = Object.assign({id:'c_' + uid()}, data, {
+        code: 'C' + pad4(db.seq.c++), createdAt: nowStr(), lastFollowAt: ''
+      });
+      db.customers.push(saved);
+    }
+    refreshCustomerReminderTexts(saved.id);
+    commit(cust ? '客户已保存' : ('客户已添加（编号 ' + saved.code + '）'));
+    closeModal();
+    invalidateAll();
+    renderActive();
+    renderSaveState();
+  });
+}
+function deleteCustomer(id){
+  const recs = db.records.filter(r => r.customerId === id);
+  const oppIds = new Set(db.opps.filter(o => o.customerId === id).map(o => o.id));
+  const recIds = new Set(recs.map(r => r.id));
+  takeSnapshot('before-delete-customer', deepClone(db));
+  db.customers = db.customers.filter(c => c.id !== id);
+  db.opps = db.opps.filter(o => o.customerId !== id);
+  db.records = db.records.filter(r => r.customerId !== id);
+  db.reminders = db.reminders.filter(r => {
+    if(r.customerId === id) return false;
+    if(oppIds.has(r.oppId)) return false;
+    if(recIds.has(r.recordId)) return false;
+    return true;
+  });
+  commit('客户及其关联数据已删除');
+  invalidateAll();
+  renderActive();
+  sweepOrphans();
+}
+
+/* ==================== 商机表单 / 阶段 ==================== */
+function openOppForm(opp, presetCustomerId){
+  const o = opp || {};
+  if(!db.customers.length){
+    toast('请先添加客户');
+    return;
+  }
+  const custSel = db.customers.map(c =>
+    '<option value="' + esc(c.id) + '"' + ((o.customerId || presetCustomerId || '') === c.id ? ' selected' : '') + '>' +
+    esc(c.name) + (c.code ? '（' + esc(c.code) + '）' : '') + '</option>').join('');
+  const history = (o.history && o.history.length) ?
+    '<div class="card history-card"><div class="card-title">阶段流转记录</div><div class="timeline">' +
+    o.history.slice().reverse().map(h =>
+      '<div class="tl-item"><span class="tl-dot" aria-hidden="true"></span><div>' +
+      '<div>' + esc(h.from) + ' → ' + esc(h.to) + '</div>' +
+      '<div class="muted small">' + esc(h.at || '') + '</div></div></div>').join('') +
+    '</div></div>' : '';
+  openModal(
+    '<div class="modal-head">' + (opp ? '编辑商机' : '新增商机') + '</div>' +
+    '<form id="oppForm" novalidate>' +
+      '<div class="field"><label for="f-ocust">关联客户 <i class="req">*</i></label><select id="f-ocust">' + custSel + '</select></div>' +
+      '<div class="field"><label for="f-oname">商机名称 <i class="req">*</i></label>' +
+        '<input id="f-oname" required maxlength="160" placeholder="如：XX 园区亮化项目" value="' + esc(o.name || '') + '" autocomplete="off"></div>' +
+      '<div class="field"><label>当前商机阶段</label>' +
+        '<div class="stage-chips" role="group" aria-label="商机阶段">' + STAGES.map(s =>
+          '<button type="button" class="st-chip ' + s.cls + ((o.stage || 'lead') === s.id ? ' on' : '') + '" data-schip="' + s.id + '" aria-pressed="' + ((o.stage || 'lead') === s.id ? 'true' : 'false') + '">' + s.name + '</button>').join('') +
+        '</div><input type="hidden" id="f-ostage" value="' + esc(o.stage || 'lead') + '"></div>' +
+      '<div class="field"><label for="f-oamount">预估金额（万元）</label>' +
+        '<input id="f-oamount" type="number" min="0" step="0.01" inputmode="decimal" placeholder="如：120" value="' + esc(o.amount == null ? '' : o.amount) + '"></div>' +
+      '<div class="field"><label for="f-oexpect">预计成交时间</label>' +
+        '<input id="f-oexpect" type="date" value="' + esc(o.expectDate || '') + '"></div>' +
+      '<div class="field"><label for="f-odealamount">成交金额（万元，签单后填）</label>' +
+        '<input id="f-odealamount" type="number" min="0" step="0.01" inputmode="decimal" placeholder="签单后填写" value="' + esc(o.dealAmount == null ? '' : o.dealAmount) + '"></div>' +
+      '<div class="field"><label for="f-ocategory">产品品类</label><select id="f-ocategory">' +
+        CATEGORIES.map(i => '<option' + (o.category === i ? ' selected' : '') + '>' + esc(i) + '</option>').join('') +
+        '</select></div>' +
+      '<div class="field"><label for="f-ocompetitor">竞争对手</label>' +
+        '<input id="f-ocompetitor" maxlength="120" placeholder="如：欧普/雷士" value="' + esc(o.competitor || '') + '" autocomplete="off"></div>' +
+      '<div class="field"><label for="f-ostatus">商机状态</label><select id="f-ostatus">' +
+        OPP_STATUS.map(i => '<option' + (o.status === i ? ' selected' : '') + '>' + i + '</option>').join('') +
+        '</select></div>' +
+      '<div class="field"><label for="f-olost">丢单原因（丢单时填写）</label>' +
+        '<textarea id="f-olost" rows="2" maxlength="600" placeholder="价格/竞品/关系…">' + esc(o.lostReason || '') + '</textarea></div>' +
+      '<div class="field"><label for="f-oowner">负责人</label><select id="f-oowner">' + memberOptions(o.owner) + '</select></div>' +
+      history +
+      '<div class="form-btns">' +
+        (opp ? '<button type="button" class="btn ghost danger-text" id="f-odel">删除</button>' : '') +
+        '<div class="spacer"></div>' +
+        '<button type="button" class="btn ghost" data-close>取消</button>' +
+        '<button type="submit" class="btn primary">保存</button>' +
+      '</div>' +
+    '</form>'
+  );
+  $$('#oppForm .st-chip').forEach(b => b.addEventListener('click', () => {
+    $('#f-ostage').value = b.dataset.schip;
+    $$('#oppForm .st-chip').forEach(x => {
+      const on = x === b;
+      x.classList.toggle('on', on);
+      x.setAttribute('aria-pressed', on ? 'true' : 'false');
+    });
+  }));
+  if(opp){
+    $('#f-odel').addEventListener('click', () => {
+      closeModal();
+      confirmDlg({
+        title: '删除商机',
+        msg: '确定删除「' + opp.name + '」？关联的跟进记录会保留，但会解除与本商机的关联。',
+        okText: '删除', danger: true,
+        onOk: () => {
+          takeSnapshot('before-delete-opp', deepClone(db));
+          db.opps = db.opps.filter(x => x.id !== opp.id);
+          db.reminders = db.reminders.filter(r => r.oppId !== opp.id);
+          db.records.forEach(r => {
+            if(r.oppId === opp.id){
+              r.oppId = '';
+              if(r.remindAt) syncRecordReminder(r);
+            }
+          });
+          commit('商机已删除');
+          invalidateAll(); renderActive();
+        }
+      });
+    });
+  }
+  $('#oppForm').addEventListener('submit', ev => {
+    ev.preventDefault();
+    const name = $('#f-oname').value.trim();
+    const customerId = $('#f-ocust').value;
+    if(!name){ toast('请填写商机名称'); $('#f-oname').focus(); return; }
+    if(!customerId){ toast('请选择关联客户'); return; }
+    const stageRaw = $('#f-ostage').value;
+    const stage = STAGES.some(s => s.id === stageRaw) ? stageRaw : 'lead';
+    const statusRaw = $('#f-ostatus').value;
+    const status = OPP_STATUS.indexOf(statusRaw) >= 0 ? statusRaw : '进行中';
+    const lost = $('#f-olost').value.trim();
+    if(status === '丢单' && !lost){ toast('丢单请填写丢单原因'); $('#f-olost').focus(); return; }
+    if(status === '丢单' && stage === 'deal'){ toast('已丢单的商机不能处于「签单」阶段，请调整阶段或状态'); return; }
+    const data = {
+      customerId: customerId,
+      name: name,
+      stage: stage,
+      amount: numOrEmpty($('#f-oamount').value),
+      expectDate: $('#f-oexpect').value,
+      dealAmount: numOrEmpty($('#f-odealamount').value),
+      category: $('#f-ocategory').value,
+      competitor: $('#f-ocompetitor').value.trim(),
+      status: status,
+      lostReason: lost,
+      owner: $('#f-oowner').value || db.settings.me || '我'
+    };
+    let saved, msg, stageChanged;
+    if(opp){
+      const oldStage = opp.stage;
+      const patch = Object.assign({}, data);
+      stageChanged = oldStage !== stage;
+      if(stageChanged){
+        patch.history = (opp.history || []).concat([{at: nowStr(), from: stageById(oldStage).name, to: stageById(stage).name}]);
+      }
+      if(stage === 'deal' && !opp.winAt) patch.winAt = todayStr();
+      Object.assign(opp, patch);
+      opp.updatedAt = nowStr();
+      saved = opp;
+      msg = '商机已保存';
+    }else{
+      saved = Object.assign({id:'o_' + uid()}, data, {
+        code: 'O' + pad4(db.seq.o++),
+        history: [{at: nowStr(), from: '—', to: stageById(stage).name}],
+        winAt: stage === 'deal' ? todayStr() : '',
+        createdAt: nowStr(), updatedAt: nowStr()
+      });
+      db.opps.push(saved);
+      msg = '商机已添加（编号 ' + saved.code + '）';
+      stageChanged = true;
+    }
+    if(stageChanged) syncStageReminder(saved, true);
+    else syncStageReminder(saved, false);
+    commit(msg);
+    closeModal();
+    invalidateAll();
+    renderActive();
+  });
+}
+function applyOppStage(oppId, stageId, silent){
+  const o = oppById(oppId);
+  if(!o) return;
+  if(o.stage === stageId){ if(!silent) toast('已经是「' + stageById(stageId).name + '」阶段'); return; }
+  const from = stageById(o.stage).name;
+  const to = stageById(stageId);
+  o.stage = stageId;
+  o.updatedAt = nowStr();
+  if(!o.history) o.history = [];
+  o.history.push({at: nowStr(), from: from, to: to.name});
+  if(stageId === 'deal' && !o.winAt) o.winAt = todayStr();
+  syncStageReminder(o);
+  commit('已切到「' + to.name + '」' + (STAGE_RULES[stageId] ? '，已自动创建跟进提醒' : ''));
+  invalidateAll();
+  renderActive();
+}
+function setOppStage(oppId, stageId){
+  const o = oppById(oppId);
+  if(!o) return;
+  if(o.stage === stageId){ toast('已经是「' + stageById(stageId).name + '」阶段'); return; }
+  if(o.status === '丢单'){
+    confirmDlg({
+      title: '恢复丢单商机？',
+      msg: '「' + o.name + '」当前标记为丢单。移动阶段会把它恢复为「进行中」，并清除原来的丢单原因。是否继续？',
+      okText: '恢复并移动',
+      onOk: () => {
+        o.status = '进行中';
+        o.lostReason = '';
+        applyOppStage(oppId, stageId);
+      }
+    });
+    return;
+  }
+  if(o.status === '暂停') toast('该商机处于暂停状态，阶段已变更但状态仍为暂停');
+  applyOppStage(oppId, stageId);
+}
+function openStagePicker(oppId){
+  const o = oppById(oppId);
+  if(!o) return;
+  openModal(
+    '<div class="modal-head">移动商机阶段</div>' +
+    '<div class="muted modal-sub">' + esc(o.name) + '</div>' +
+    '<div class="stage-chips">' + STAGES.map(s =>
+      '<button type="button" class="st-chip ' + s.cls + (o.stage === s.id ? ' on' : '') + '" data-pick-stage="' + s.id + '">' + s.name + '</button>'
+    ).join('') + '</div>' +
+    '<div class="form-btns"><button type="button" class="btn ghost" data-close>取消</button></div>'
+  );
+  $$('#modalBox [data-pick-stage]').forEach(b => b.addEventListener('click', () => {
+    const stage = b.dataset.pickStage;
+    closeModal();
+    setOppStage(oppId, stage);
+  }));
+}
+function nextStageId(oppId){
+  const o = oppById(oppId);
+  if(!o) return 'lead';
+  const i = STAGES.findIndex(s => s.id === o.stage);
+  return STAGES[Math.min(STAGES.length - 1, i + 1)].id;
+}
+function prevStageId(oppId){
+  const o = oppById(oppId);
+  if(!o) return 'lead';
+  const i = STAGES.findIndex(s => s.id === o.stage);
+  return STAGES[Math.max(0, i - 1)].id;
+}
+
+/* ==================== 跟进记录表单 ==================== */
+let tempPhotos = [];
+function openRecordForm(rec, presetCustomerId){
+  if(!db.customers.length){
+    toast('请先添加客户');
+    return;
+  }
+  const r = rec || {};
+  tempPhotos = (r.photos || []).map(id => ({id: id, src: photoSrc(id)})).filter(x => x.id);
+  const custSel = db.customers.map(c =>
+    '<option value="' + esc(c.id) + '"' + ((r.customerId || presetCustomerId || '') === c.id ? ' selected' : '') + '>' +
+    esc(c.name) + '</option>').join('');
+  const typeSel = r.type || '电话沟通';
+  const timeVal = r.time || nowInput();
+  openModal(
+    '<div class="modal-head">' + (rec ? '编辑跟进记录' : '新增跟进记录') + '</div>' +
+    '<form id="recForm" novalidate>' +
+      '<div class="field"><label for="f-rcust">关联客户 <i class="req">*</i></label><select id="f-rcust">' + custSel + '</select></div>' +
+      '<div class="field"><label for="f-ropp">关联商机（可选）</label><select id="f-ropp"><option value="">不关联商机</option></select></div>' +
+      '<div class="field"><label>跟进类型</label>' +
+        '<div class="seg" role="group" aria-label="跟进类型">' + FOLLOW_TYPES.map(t =>
+          '<button type="button" class="seg-btn' + (t === typeSel ? ' on' : '') + '" data-rtype="' + t + '" aria-pressed="' + (t === typeSel ? 'true' : 'false') + '">' + t + '</button>').join('') +
+        '</div><input type="hidden" id="f-rtype" value="' + esc(typeSel) + '"></div>' +
+      '<div class="field"><label for="f-rtime">跟进时间</label>' +
+        '<input id="f-rtime" type="datetime-local" value="' + esc(timeVal) + '"></div>' +
+      '<div class="field"><label for="f-rcontent">跟进内容 <i class="req">*</i></label>' +
+        '<textarea id="f-rcontent" rows="4" maxlength="5000" placeholder="聊了什么、客户顾虑…">' + esc(r.content || '') + '</textarea></div>' +
+      '<div class="field"><label for="f-rfeedback">客户反馈</label>' +
+        '<textarea id="f-rfeedback" rows="2" maxlength="5000" placeholder="客户的意见、顾虑、态度">' + esc(r.feedback || '') + '</textarea></div>' +
+      '<div class="field"><label for="f-rnextplan">下次跟进计划</label>' +
+        '<textarea id="f-rnextplan" rows="2" maxlength="5000" placeholder="下一步做什么">' + esc(r.nextPlan || '') + '</textarea></div>' +
+      '<div class="field"><label for="f-rremind">下次跟进提醒（精确到分钟）</label>' +
+        '<input id="f-rremind" type="datetime-local" value="' + esc(r.remindAt || '') + '">' +
+        '<div class="quick-row">' +
+          '<button type="button" class="mini-btn ghost" data-remind-preset="' + esc(dstrAt(0, '18:00')) + '">今天 18:00</button>' +
+          '<button type="button" class="mini-btn ghost" data-remind-preset="' + esc(dstrAt(1, '09:00')) + '">明天 09:00</button>' +
+          '<button type="button" class="mini-btn ghost" data-remind-preset="' + esc(dstrAt(3, '09:00')) + '">3 天后</button>' +
+          '<button type="button" class="mini-btn ghost" data-remind-clear="1">清除</button>' +
+        '</div></div>' +
+      '<div class="field"><label>拜访照片（现场/名片/图纸）</label>' +
+        '<div class="photo-grid" id="photoList"></div>' +
+        '<div id="photoStatus" class="photo-status" hidden></div>' +
+        '<input id="f-rophotos" type="file" accept="image/jpeg,image/png,image/webp,image/gif" multiple class="file-input">' +
+        '<p class="hint">最多 ' + PHOTO_MAX + ' 张；自动压缩到 ' + PHOTO_EDGE + 'px，单张原图不超过 25MB。HEIC 请先在相册转 JPG。</p></div>' +
+      '<div class="field"><label for="f-rownr">跟进人</label><select id="f-rownr">' + memberOptions(r.owner) + '</select></div>' +
+      '<div class="form-btns">' +
+        (rec ? '<button type="button" class="btn ghost danger-text" id="f-rdel">删除</button>' : '') +
+        '<div class="spacer"></div>' +
+        '<button type="button" class="btn ghost" data-close>取消</button>' +
+        '<button type="submit" class="btn primary">保存</button>' +
+      '</div>' +
+    '</form>',
+    {onClose: function(){ tempPhotos = []; sweepOrphans(); }}
+  );
+  syncOppOptions(r.customerId || presetCustomerId || '', r.oppId || '');
+  $('#f-rcust').addEventListener('change', () => syncOppOptions($('#f-rcust').value, ''));
+  $$('#recForm .seg-btn').forEach(b => b.addEventListener('click', () => {
+    $('#f-rtype').value = b.dataset.rtype;
+    $$('#recForm .seg-btn').forEach(x => {
+      const on = x === b;
+      x.classList.toggle('on', on);
+      x.setAttribute('aria-pressed', on ? 'true' : 'false');
+    });
+  }));
+  $$('#recForm [data-remind-preset]').forEach(b => b.addEventListener('click', () => {
+    $('#f-rremind').value = b.dataset.remindPreset;
+  }));
+  $$('#recForm [data-remind-clear]').forEach(b => b.addEventListener('click', () => {
+    $('#f-rremind').value = '';
+  }));
+  renderPhotoList();
+  $('#f-rophotos').addEventListener('change', async function(){
+    const files = Array.from(this.files || []);
+    this.value = '';
+    if(!files.length) return;
+    if(photoMode !== 'idb'){
+      const ok = await ensurePhotoStore();
+      if(!ok){ toast('当前浏览器无法保存照片（IndexedDB 不可用）'); return; }
+    }
+    if(tempPhotos.length >= PHOTO_MAX){ toast('最多 ' + PHOTO_MAX + ' 张照片'); return; }
+    const room = PHOTO_MAX - tempPhotos.length;
+    if(files.length > room) toast('最多还能添加 ' + room + ' 张，已自动截取');
+    const batch = files.slice(0, room);
+    runtime.photoBusy = true;
+    setRecSubmitBusy(true);
+    const status = $('#photoStatus');
+    if(status){ show(status); status.textContent = '正在处理 0/' + batch.length; status.className = 'photo-status'; }
+    let failed = 0, lastError = '';
+    for(let i = 0; i < batch.length; i++){
+      try{
+        const dataUrl = await compressImage(batch[i]);
+        const id = await persistPhoto(dataUrl);
+        tempPhotos.push({id: id, src: dataUrl});
+        renderPhotoList();
+      }catch(e){
+        failed++;
+        lastError = e && e.message ? e.message : '读取失败';
+      }
+      if(status) status.textContent = '正在处理 ' + (i+1) + '/' + batch.length;
+    }
+    runtime.photoBusy = false;
+    setRecSubmitBusy(false);
+    if(status){
+      if(failed){
+        status.textContent = failed + ' 张照片失败' + (lastError ? '：' + lastError : '');
+        status.className = 'photo-status warn';
+      }else{
+        status.textContent = '已添加 ' + batch.length + ' 张照片';
+        status.className = 'photo-status';
+      }
+      setTimeout(() => { if(status) hide(status); }, 5000);
+    }
+    if(failed) toast(failed + ' 张照片读取失败' + (lastError ? '：' + lastError : ''));
+  });
+  if(rec){
+    $('#f-rdel').addEventListener('click', () => {
+      closeModal();
+      confirmDlg({
+        title: '删除跟进记录',
+        msg: '确定删除这条跟进记录？关联照片和这条记录的提醒会一并删除。',
+        okText: '删除', danger: true,
+        onOk: () => {
+          takeSnapshot('before-delete-record', deepClone(db));
+          db.records = db.records.filter(x => x.id !== rec.id);
+          db.reminders = db.reminders.filter(x => x.recordId !== rec.id);
+          recalcCustomerFollow(rec.customerId);
+          commit('跟进记录已删除');
+          invalidateAll();
+          renderActive();
+          sweepOrphans();
+        }
+      });
+    });
+  }
+  $('#recForm').addEventListener('submit', ev => {
+    ev.preventDefault();
+    if(runtime.photoBusy){ toast('照片还在处理中，请稍等再保存'); return; }
+    const customerId = $('#f-rcust').value;
+    const content = $('#f-rcontent').value.trim();
+    if(!customerId){ toast('请选择客户'); return; }
+    if(!content){ toast('请填写跟进内容'); $('#f-rcontent').focus(); return; }
+    const oldCustomerId = rec ? rec.customerId : '';
+    const time = normDateTime($('#f-rtime').value) || nowInput();
+    const data = {
+      customerId: customerId,
+      oppId: $('#f-ropp').value || '',
+      type: $('#f-rtype').value,
+      time: time,
+      content: content,
+      feedback: $('#f-rfeedback').value.trim(),
+      nextPlan: $('#f-rnextplan').value.trim(),
+      remindAt: normDateTime($('#f-rremind').value),
+      photos: tempPhotos.map(p => p.id).slice(0, PHOTO_MAX),
+      owner: $('#f-rownr').value || db.settings.me || '我'
+    };
+    let saved;
+    if(rec){
+      Object.assign(rec, data);
+      saved = rec;
+    }else{
+      saved = Object.assign({id:'r_' + uid(), createdAt: nowStr()}, data);
+      db.records.push(saved);
+    }
+    recalcCustomerFollow(customerId);
+    if(oldCustomerId && oldCustomerId !== customerId) recalcCustomerFollow(oldCustomerId);
+    syncRecordReminder(saved);
+    touchOpp(saved.oppId, time);
+    commit(rec ? '已保存' : '跟进记录已保存');
+    closeModal();
+    invalidateAll();
+    renderActive();
+  });
+}
+function setRecSubmitBusy(busy){
+  const btn = $('#recForm button[type="submit"]');
+  if(!btn) return;
+  btn.disabled = busy;
+  btn.textContent = busy ? '照片处理中…' : '保存';
+}
+function syncOppOptions(customerId, selected){
+  const sel = $('#f-ropp');
+  if(!sel) return;
+  sel.innerHTML = '<option value="">不关联商机</option>' +
+    db.opps.filter(o => o.customerId === customerId).map(o =>
+      '<option value="' + esc(o.id) + '"' + (o.id === selected ? ' selected' : '') + '>' +
+      esc(o.name) + ' · ' + stageById(o.stage).name + '</option>').join('');
+}
+function renderPhotoList(){
+  const el = $('#photoList');
+  if(!el) return;
+  if(!tempPhotos.length){ el.innerHTML = '<div class="muted">暂无照片</div>'; return; }
+  el.innerHTML = tempPhotos.map((p, i) => {
+    const src = p.src ? safeDataUrl(p.src) : photoSrc(p.id);
+    return '<div class="photo-item">' +
+      (src ? '<img src="' + esc(src) + '" alt="照片 ' + (i+1) + '">' : '<div class="photo-missing">缺失</div>') +
+      '<button type="button" class="photo-del" data-del-photo="' + i + '" aria-label="删除第 ' + (i+1) + ' 张照片">×</button>' +
+    '</div>';
+  }).join('');
+  $$('#photoList [data-del-photo]').forEach(b => b.addEventListener('click', () => {
+    tempPhotos.splice(Number(b.dataset.delPhoto), 1);
+    renderPhotoList();
+  }));
+}
+function recalcCustomerFollow(customerId){
+  if(!customerId) return;
+  const c = custById(customerId);
+  if(!c) return;
+  let latest = '';
+  db.records.forEach(r => {
+    if(r.customerId !== customerId) return;
+    const t = fmtDT(r.time);
+    if(t !== '—' && t > latest) latest = t;
+  });
+  c.lastFollowAt = latest;
+}
+function refreshCustomerReminderTexts(customerId){
+  db.records.forEach(r => {
+    if(r.customerId === customerId && r.remindAt) syncRecordReminder(r);
+  });
+  db.opps.forEach(o => {
+    if(o.customerId === customerId && STAGE_RULES[o.stage]) syncStageReminder(o, false);
+  });
+}
+function touchOpp(oppId, time){
+  if(!oppId) return;
+  const o = oppById(oppId);
+  if(!o) return;
+  const t = fmtDT(time);
+  if(t !== '—' && (!o.updatedAt || t > o.updatedAt)) o.updatedAt = t;
+}
+
+/* ==================== 客户详情抽屉 ==================== */
+function openCustomer(id){
+  const c = custById(id);
+  if(!c) return;
+  const lvl = LEVELS.find(l => l[0] === c.level) || LEVELS[1];
+  const opps = db.opps.filter(o => o.customerId === id).sort((a, b) => (b.updatedAt || '').localeCompare(a.updatedAt || ''));
+  const recs = db.records.filter(r => r.customerId === id).sort((a, b) => (b.time || '').localeCompare(a.time || ''));
+  const rems = db.reminders.filter(r => r.customerId === id && !r.done);
+  let h = '<button type="button" class="sheet-close" data-close-sheet aria-label="关闭客户详情">×</button>';
+  h += '<div class="sheet-head">' +
+    '<div class="avatar big" aria-hidden="true">' + esc((c.name || '?').slice(0, 1)) + '</div>' +
+    '<div><div class="cust-name">' + esc(c.name) + '<span class="lvl lvl-' + lvl[0] + '">' + lvl[0] + '</span>' +
+    '<span class="code-tag">' + esc(c.code || '') + '</span></div>' +
+    '<div class="muted">' + esc([c.industry, c.contact, c.position].filter(Boolean).join(' · ') || '未填写详细信息') + '</div></div></div>';
+  if(c.phone){
+    h += isPhoneSafe(c.phone)
+      ? '<a class="info-row" href="tel:' + esc(c.phone.replace(/[^0-9+]/g, '')) + '"><span aria-hidden="true">📞</span>' + esc(c.phone) + '<em>拨打</em></a>'
+      : '<div class="info-row"><span aria-hidden="true">📞</span>' + esc(c.phone) + '</div>';
+  }
+  if(c.wechat) h += '<div class="info-row"><span aria-hidden="true">💬</span>微信：' + esc(c.wechat) + '</div>';
+  if(c.email) h += '<div class="info-row"><span aria-hidden="true">✉️</span>' + esc(c.email) + '</div>';
+  if(c.address) h += '<div class="info-row"><span aria-hidden="true">📍</span>' + esc(c.address) + '</div>';
+  h += '<div class="info-row"><span aria-hidden="true">🔎</span>来源：' + esc(c.source || '—') + ' · 负责人：' + esc(c.owner || '—') + '</div>';
+  h += '<div class="info-row"><span aria-hidden="true">⏱️</span>最后跟进：' + esc(c.lastFollowAt || '从未跟进') + '</div>';
+  if(c.remark) h += '<div class="info-row"><span aria-hidden="true">📌</span>' + esc(c.remark) + '</div>';
+  h += '<div class="sheet-actions">' +
+    '<button type="button" class="btn primary" id="sheetNewOpp">＋ 新增商机</button>' +
+    '<button type="button" class="btn" id="sheetNewRec">＋ 跟进记录</button>' +
+    '<button type="button" class="btn ghost" id="sheetEdit">编辑</button>' +
+    '<button type="button" class="btn ghost danger-text" id="sheetDel">删除</button>' +
+  '</div>';
+  if(rems.length){
+    h += '<div class="card"><div class="card-title">待办提醒</div>' + rems.map(r =>
+      '<div class="mini-follow"><span class="type-badge">提醒</span>' +
+      '<span class="mini-follow-text">' + esc(r.text) + '</span>' +
+      '<span class="muted">' + esc(fmtDT(r.remindAt)) + '</span></div>').join('') + '</div>';
+  }
+  h += '<div class="card"><div class="card-title">商机（' + opps.length + '）</div>' +
+    (opps.length ? opps.map(o => {
+      const s = stageById(o.stage);
+      return '<button type="button" class="mini-opp" data-edit-opp="' + esc(o.id) + '">' +
+        '<span class="st-badge ' + s.cls + '">' + s.name + '</span>' +
+        '<span class="mini-opp-name">' + esc(o.name) + '</span>' +
+        '<b>' + fmtWan(o.amount) + '</b></button>';
+    }).join('') : '<div class="empty">暂无商机</div>') + '</div>';
+  h += '<div class="card"><div class="card-title">跟进记录（' + recs.length + '）</div>' +
+    (recs.length ? recs.slice(0, 30).map(r =>
+      '<button type="button" class="mini-rec" data-edit-rec="' + esc(r.id) + '">' +
+      '<div class="mini-rec-top"><span class="type-badge">' + esc(r.type) + '</span>' +
+      '<span class="muted">' + esc(fmtDT(r.time)) + '</span>' +
+      (r.remindAt ? '<span class="tag tag-orange">提醒 ' + esc(fmtDT(r.remindAt)) + '</span>' : '') + '</div>' +
+      '<div class="mini-rec-content">' + esc(r.content) + '</div></button>').join('') : '<div class="empty">暂无跟进记录</div>') + '</div>';
+  $('#sheetBody').innerHTML = h;
+  show($('#backdrop'));
+  show($('#sheet'));
+  $('#sheet').setAttribute('aria-label', '客户详情：' + c.name);
+  document.body.classList.add('sheet-open');
+  $('#sheetNewOpp').onclick = () => { closeSheet(); openOppForm(null, id); };
+  $('#sheetNewRec').onclick = () => { closeSheet(); openRecordForm(null, id); };
+  $('#sheetEdit').onclick = () => { closeSheet(); openCustomerForm(c); };
+  $('#sheetDel').onclick = () => {
+    closeSheet();
+    confirmDlg({
+      title: '删除客户',
+      msg: '将同时删除该客户的全部商机、跟进记录、照片和提醒，确定删除？',
+      okText: '删除', danger: true,
+      onOk: () => deleteCustomer(id)
+    });
+  };
+  setTimeout(() => { const b = $('#sheet .sheet-close'); if(b) try{ b.focus(); }catch(e){} }, 50);
+}
+function closeSheet(){
+  hide($('#sheet'));
+  hide($('#backdrop'));
+  document.body.classList.remove('sheet-open');
+}
+function openFabMenu(){
+  openModal(
+    '<div class="modal-head">快捷新增</div>' +
+    '<button type="button" class="row-btn" data-fab="customer"><span aria-hidden="true">👤</span>新增客户<em>›</em></button>' +
+    '<button type="button" class="row-btn" data-fab="opp"><span aria-hidden="true">🎯</span>新增商机<em>›</em></button>' +
+    '<button type="button" class="row-btn" data-fab="record"><span aria-hidden="true">📝</span>新增跟进记录<em>›</em></button>' +
+    '<div class="form-btns"><button type="button" class="btn ghost" data-close>取消</button></div>'
+  );
+  $$('#modalBox [data-fab]').forEach(b => b.addEventListener('click', () => {
+    closeModal();
+    if(b.dataset.fab === 'customer') openCustomerForm();
+    else if(b.dataset.fab === 'opp') openOppForm();
+    else openRecordForm();
+  }));
+}
+
+/* ==================== 提醒列表 ==================== */
+function openReminders(){
+  const list = getReminders();
+  const due = list.filter(isDue).length;
+  let h = '<div class="modal-head">待跟进提醒' + (due ? '<span class="tag tag-red title-tag">' + due + ' 项到期</span>' : '') + '</div>';
+  h += '<div class="quick-row modal-actions">' +
+    '<button type="button" class="mini-btn" data-rem-ics="1">导出到日历</button>' +
+    '<button type="button" class="mini-btn" data-rem-notify="1">开启浏览器通知</button>' +
+  '</div>';
+  if(!list.length) h += '<div class="empty">暂无提醒，可在跟进记录中设置「下次跟进提醒」</div>';
+  list.forEach(r => {
+    h += '<div class="remind-row">' +
+      '<div class="remind-main"><div class="remind-text">' + esc(r.text) + '</div>' +
+      '<div class="muted">' + esc(fmtDT(r.remindAt)) + ' · ' + esc(reminderLabel(r.remindAt)) + '</div></div>' +
+      (r.done
+        ? '<span class="tag tag-green">已完成</span>'
+        : '<button type="button" class="mini-btn primary" data-rem-done="' + esc(r.id) + '">完成</button>' +
+          '<button type="button" class="mini-btn ghost" data-rem-del="' + esc(r.id) + '" aria-label="删除提醒">删除</button>') +
+    '</div>';
+  });
+  h += '<div class="form-btns"><button type="button" class="btn ghost" data-close>关闭</button></div>';
+  openModal(h);
+  $$('#modalBox [data-rem-done]').forEach(b => b.addEventListener('click', () => {
+    completeReminder(b.dataset.remDone);
+    closeModal(true);
+    openReminders();
+  }));
+  $$('#modalBox [data-rem-del]').forEach(b => b.addEventListener('click', () => {
+    const rem = db.reminders.find(r => r.id === b.dataset.remDel);
+    if(rem && rem.recordId){
+      const rec = db.records.find(r => r.id === rem.recordId);
+      if(rec) rec.remindAt = '';
+    }
+    db.reminders = db.reminders.filter(r => r.id !== b.dataset.remDel);
+    commit('提醒已删除');
+    closeModal(true);
+    openReminders();
+    invalidateAll();
+    renderActive();
+  }));
+  $$('#modalBox [data-rem-ics]').forEach(b => b.addEventListener('click', exportICS));
+  $$('#modalBox [data-rem-notify]').forEach(b => b.addEventListener('click', async () => {
+    await requestNotifications();
+    closeModal(true);
+    openReminders();
+  }));
+}
+
+/* ==================== 自动快照 ==================== */
+async function openSnapshots(){
+  openModal(
+    '<div class="modal-head">自动快照与恢复</div>' +
+    '<p class="hint">应用会在数据变化后自动保存快照（文字数据，约保留最近 8 份）。照片保存在独立照片库中，不随快照回滚。</p>' +
+    '<div id="snapBody"><div class="muted">正在读取…</div></div>' +
+    '<div class="form-btns">' +
+      '<button type="button" class="btn" id="snapNow">立即创建快照</button>' +
+      '<button type="button" class="btn ghost danger-text" id="snapPurge">清空快照</button>' +
+      '<button type="button" class="btn ghost" data-close>关闭</button></div>'
+  );
+  const body = $('#snapBody');
+  const list = await listSnapshots();
+  if(!list.length){
+    body.innerHTML = '<div class="empty">还没有快照。点击「立即创建快照」可手动备份一份文字数据。</div>';
+  }else{
+    body.innerHTML = list.map(s => {
+      const sum = s.summary || {};
+      const at = Number(s.at);
+      if(!isFinite(at)) return '';
+      return '<div class="remind-row">' +
+        '<div class="remind-main"><div class="remind-text">' + esc(s.time || fmtDT(new Date(at))) + '</div>' +
+        '<div class="muted">' + esc(s.reason === 'auto' ? '自动' : '手动') +
+        ' · 客户 ' + esc(String(sum.customers || 0)) +
+        ' · 商机 ' + esc(String(sum.opps || 0)) +
+        ' · 跟进 ' + esc(String(sum.records || 0)) + '</div></div>' +
+        '<button type="button" class="mini-btn primary" data-snap-restore="' + at + '">恢复</button>' +
+      '</div>';
+    }).join('');
+    $$('#snapBody [data-snap-restore]').forEach(b => b.addEventListener('click', () => {
+      restoreSnapshot(Number(b.dataset.snapRestore));
+    }));
+  }
+  $('#snapNow').addEventListener('click', async () => {
+    const ok = await takeSnapshot('manual', deepClone(db));
+    toast(ok ? '快照已创建' : '快照创建失败（存储不可用或数据过大）');
+    closeModal(true);
+    openSnapshots();
+  });
+  $('#snapPurge').addEventListener('click', () => {
+    confirmDlg({
+      title: '清空自动快照',
+      msg: '将删除本机保存的所有文字快照（不包括当前正在使用的数据）。删除后无法再从快照恢复，确定？',
+      okText: '清空快照', danger: true,
+      onOk: async () => {
+        try{ await IDB.request('snapshots', 'readwrite', s => s.clear()); }catch(e){}
+        lastSnapshotAt = 0;
+        toast('自动快照已清空');
+        closeModal(true);
+        openSnapshots();
+      }
+    });
+  });
+}
+async function restoreSnapshot(at){
+  const snap = await readSnapshot(at);
+  if(!snap){ toast('快照不存在或已损坏'); return; }
+  let parsed;
+  try{ parsed = JSON.parse(snap.text); }
+  catch(e){ toast('快照内容损坏，无法恢复'); return; }
+  const n = normalizeDB(parsed);
+  confirmDlg({
+    title: '恢复快照',
+    msg: '将用 ' + fmtDT(snap.time) + ' 的快照覆盖当前数据（客户 ' + n.db.customers.length +
+      '、商机 ' + n.db.opps.length + '、跟进 ' + n.db.records.length + '）。当前数据会先自动备份一份。确定恢复？',
+    okText: '恢复', danger: true,
+    onOk: async () => {
+      await takeSnapshot('before-restore', deepClone(db));
+      db = n.db;
+      const missing = db.records.reduce((acc, r) =>
+        acc + (r.photos || []).filter(id => !photoCache.has(id)).length, 0);
+      if(n.photos.length) await persistPendingPhotos(n.photos);
+      corruptInfo = null;
+      save({snapshot: true, reason: 'restore'});
+      invalidateAll();
+      renderAll();
+      toast('快照已恢复' + (missing ? '；有 ' + missing + ' 张照片在本机照片库中不存在' : ''));
+      closeModal(true);
+    }
+  });
+}
+async function persistPendingPhotos(photos){
+  if(photoMode !== 'idb') return 0;
+  let failed = 0;
+  for(const p of photos || []){
+    try{ await persistPhotoWithId(p.id, p.dataUrl); }
+    catch(e){ failed++; }
+  }
+  return failed;
+}
+
+/* ==================== 损坏数据 ==================== */
+function openCorruptDialog(){
+  if(!corruptInfo) return;
+  openModal(
+    '<div class="modal-head">本地数据损坏</div>' +
+    '<p class="confirm-msg">应用读取本地数据时出错：' + esc(corruptInfo.error) + '。原始内容已保留，没有被空数据覆盖。</p>' +
+    '<p class="hint">建议先下载原始内容并保存好，再尝试从自动快照恢复。若直接开始录入，新的保存会写入当前空库，但原始副本仍会保留。</p>' +
+    '<div class="form-stack">' +
+      '<button type="button" class="btn" id="corruptDownload">下载原始数据</button>' +
+      '<button type="button" class="btn" id="corruptSnapshots">查看自动快照并恢复</button>' +
+      '<button type="button" class="btn ghost" id="corruptDismiss">先不处理，继续使用</button>' +
+    '</div>'
+  );
+  $('#corruptDownload').addEventListener('click', () => {
+    download(corruptInfo.raw, '商机管家_损坏数据_' + todayStr() + '.json', 'application/json');
+    toast('原始数据已下载');
+  });
+  $('#corruptSnapshots').addEventListener('click', () => { closeModal(); openSnapshots(); });
+  $('#corruptDismiss').addEventListener('click', () => { corruptInfo = null; closeModal(); renderGlobal(); });
+}
+
+/* ==================== 下载 / 导出 ==================== */
+function download(content, filename, mime){
+  const blob = new Blob([content], {type: mime});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 2000);
+}
+async function exportJSON(){
+  try{
+    const out = deepClone(db);
+    out.app = '商机管家';
+    out.exportedAt = nowStr();
+    out.exportVersion = SCHEMA_VERSION;
+    out.photosInline = true;
+    let count = 0, missing = 0;
+    out.records.forEach((r, i) => {
+      const ids = db.records[i].photos || [];
+      const arr = [];
+      ids.forEach(id => {
+        const src = photoSrc(id);
+        if(src){ arr.push(src); count++; }
+        else missing++;
+      });
+      r.photos = arr;
+    });
+    const text = JSON.stringify(out, null, 2);
+    download(text, '商机管家备份_' + todayStr() + '.json', 'application/json');
+    db.settings.lastExportAt = nowStr();
+    save({silent: true});
+    invalidateAll();
+    if(state.page === 'more') renderMore();
+    renderSaveState();
+    toast('备份已导出' + (count ? '，含 ' + count + ' 张照片' : '') + (missing ? '；' + missing + ' 张照片缺失' : ''));
+  }catch(e){
+    toast('导出失败：' + (e && e.message ? e.message : e));
+  }
+}
+function csvCell(v){
+  let s = String(v == null ? '' : v);
+  if(/^[=+\-@\t\r]/.test(s)) s = "'" + s;
+  return '"' + s.replace(/"/g, '""') + '"';
+}
+function exportCSV(kind){
+  let head = [], rows = [];
+  if(kind === 'customers'){
+    head = ['客户编号','客户名称','行业','客户地址','联系人','职位','联系电话','微信','邮箱','公司来源','负责人','客户等级','备注','创建时间','最后跟进时间'];
+    rows = db.customers.map(c => [c.code, c.name, c.industry, c.address, c.contact, c.position, c.phone, c.wechat, c.email, c.source, c.owner, c.level, c.remark, c.createdAt, c.lastFollowAt]);
+  }else if(kind === 'opps'){
+    head = ['商机编号','客户名称','商机名称','当前阶段','预估金额(万元)','预计成交时间','成交金额(万元)','产品品类','竞争对手','商机状态','丢单原因','负责人','成交日期','创建时间'];
+    rows = db.opps.map(o => [o.code, custName(o.customerId), o.name, stageById(o.stage).name, o.amount, o.expectDate, o.dealAmount, o.category, o.competitor, o.status, o.lostReason, o.owner, o.winAt, o.createdAt]);
+  }else{
+    head = ['客户名称','关联商机','跟进类型','跟进时间','跟进内容','客户反馈','下次跟进计划','下次提醒时间','拜访照片(张)','跟进人'];
+    rows = db.records.map(r => {
+      const o = r.oppId ? oppById(r.oppId) : null;
+      return [custName(r.customerId), o ? o.name : '', r.type, fmtDT(r.time), r.content, r.feedback, r.nextPlan, fmtDT(r.remindAt), (r.photos || []).length, r.owner];
+    });
+  }
+  const csv = '\ufeff' + [head].concat(rows).map(r => r.map(csvCell).join(',')).join('\r\n');
+  download(csv, ({customers:'客户表',opps:'商机表',records:'跟进记录'}[kind]) + '_' + todayStr() + '.csv', 'text/csv;charset=utf-8');
+  toast('已导出 CSV');
+}
+
+/* ==================== 导入 ==================== */
+async function importBackup(file){
+  if(!file) return;
+  if(file.size > MAX_IMPORT_BYTES){ toast('文件超过 80MB，无法导入'); return; }
+  let text;
+  try{ text = await file.text(); }
+  catch(e){ toast('文件读取失败'); return; }
+  let parsed;
+  try{ parsed = JSON.parse(text); }
+  catch(e){ toast('不是有效的 JSON 备份文件'); return; }
+  const n = normalizeDB(parsed);
+  const total = n.db.customers.length + n.db.opps.length + n.db.records.length;
+  if(!total && !n.photos.length){
+    toast('备份里没有可导入的数据');
+    return;
+  }
+  if(n.photos.length && photoMode !== 'idb'){
+    toast('当前浏览器无法保存照片，导入会丢失照片；请换用普通模式或关闭无痕模式后重试');
+    return;
+  }
+  confirmDlg({
+    title: '导入数据备份',
+    msg: '备份包含：客户 ' + n.db.customers.length + ' 个、商机 ' + n.db.opps.length +
+      ' 个、跟进 ' + n.db.records.length + ' 条、照片 ' + n.photos.length + ' 张。\n\n' +
+      '导入会覆盖当前全部数据，当前数据会先自动创建一份快照。确定继续？',
+    okText: '覆盖并导入', danger: true,
+    onOk: async () => {
+      await takeSnapshot('before-import', deepClone(db));
+      let failed = 0;
+      if(n.photos.length){
+        failed = await persistPendingPhotos(n.photos);
+      }
+      db = n.db;
+      if(failed){
+        const okIds = new Set(n.photos.map(p => p.id));
+        /* 失败的照片无法显示，避免留下空引用 */
+        const failedIds = new Set();
+        n.photos.forEach(p => { if(!okIds.has(p.id) || !photoCache.has(p.id)) failedIds.add(p.id); });
+        if(failedIds.size){
+          db.records.forEach(r => { r.photos = (r.photos || []).filter(id => !failedIds.has(id)); });
+        }
+      }
+      save();
+      invalidateAll();
+      renderAll();
+      toast('导入完成' + (failed ? ('；' + failed + ' 张照片写入失败') : ''));
+      sweepOrphans();
+    }
+  });
+}
+
+/* ==================== 清空 / 示例数据 ==================== */
+function clearAllData(){
+  confirmDlg({
+    title: '清空全部数据',
+    msg: '将删除所有客户、商机、跟进记录、提醒、照片和自动快照。此操作无法撤销，确定继续？',
+    okText: '继续', danger: true,
+    onOk: () => {
+      confirmDlg({
+        title: '再次确认',
+        msg: '真的要清空吗？如果还需要这些客户资料，请先取消并导出 JSON 备份。清空后自动快照也会被删除。',
+        okText: '彻底清空', danger: true,
+        onOk: async () => {
+          db = emptyDB();
+          photoCache.clear();
+          pendingPhotos = [];
+          try{ await IDB.request('photos', 'readwrite', s => s.clear()); }catch(e){}
+          try{ await IDB.request('snapshots', 'readwrite', s => s.clear()); }catch(e){}
+          lastSnapshotAt = Date.now();
+          save({silent: true});
+          invalidateAll();
+          renderAll();
+          toast('已清空全部数据');
+        }
+      });
+    }
+  });
+}
+function seedDemo(){
+  const mkC = (name, industry, address, contact, position, phone, wechat, email, source, owner, level, remark) => ({
+    id: 'c_' + uid(), code: 'C' + pad4(db.seq.c++), name: name, industry: industry, address: address,
+    contact: contact, position: position, phone: phone, wechat: wechat, email: email,
+    source: source, owner: owner, level: level, remark: remark,
+    createdAt: nowStr(), lastFollowAt: ''
+  });
+  const c1 = mkC('华信科技园区', '工程', '高新区科技大道 88 号', '张伟', '项目经理', '13800001111', 'zhangwei888', 'zhang@hx.com', '展会', db.settings.me || '我', 'A', '园区亮化改造，预算充足');
+  const c2 = mkC('宏图照明经销', '经销商', '城南灯具城 3 栋 12 号', '李芳', '老板', '13900002222', 'lifang666', '', '老客户转介绍', db.settings.me || '我', 'B', '主做工程渠道，年采购量大');
+  const c3 = mkC('蓝天学校', '其他', '开发区育才路 5 号', '王强', '后勤主任', '13700003333', '', 'wang@lt.edu', '上门陌拜', db.settings.me || '我', 'C', '教学楼照明改造，预算有限');
+  const mkO = (custId, name, stage, amount, expectOff, category, competitor, owner) => ({
+    id: 'o_' + uid(), code: 'O' + pad4(db.seq.o++), customerId: custId, name: name, stage: stage, amount: amount,
+    expectDate: dstr(expectOff), dealAmount: '', category: category, competitor: competitor, status: '进行中',
+    lostReason: '', owner: owner, history: [{at: nowStr(), from: '—', to: stageById(stage).name}],
+    winAt: stage === 'deal' ? dstr(-5) : '', createdAt: nowStr(), updatedAt: nowStr()
+  });
+  const o1 = mkO(c1.id, '园区道路亮化项目', 'quote', 120, 25, 'LED路灯', '欧普/雷士', db.settings.me || '我');
+  const o2 = mkO(c1.id, '办公楼投光灯改造', 'need', 30, 45, 'LED投光灯', '三雄极光', db.settings.me || '我');
+  const o3 = mkO(c2.id, '年度经销商供货', 'bid', 260, 15, 'LED线条灯', '木林森', db.settings.me || '我');
+  const o4 = mkO(c3.id, '教学楼教室灯改造', 'deal', 45, -20, 'LED工矿灯', '佛山照明', db.settings.me || '我');
+  o4.dealAmount = 42;
+  o4.winAt = dstr(-5);
+  const mkR = (custId, oppId, type, dateOff, remindOff, content, feedback, nextPlan) => ({
+    id: 'r_' + uid(), customerId: custId, oppId: oppId || '', type: type,
+    time: dstr(dateOff) + 'T10:30', content: content, feedback: feedback, nextPlan: nextPlan,
+    remindAt: remindOff == null ? '' : (remindOff === 0 ? dstrAt(0, '17:30') : dstrAt(remindOff, '09:00')),
+    photos: [], owner: db.settings.me || '我', createdAt: nowStr()
+  });
+  const r1 = mkR(c1.id, o1.id, '上门拜访', -6, -2, '现场勘查道路长度，介绍 LED 路灯方案与光效参数。', '客户认可产品，关注质保年限和安装周期。', '整理报价单，3 天内回访');
+  const r2 = mkR(c1.id, o1.id, '电话沟通', -1, 3, '电话确认报价清单细节，客户要求补充 5 年质保条款。', '希望单价再优惠 5%。', '修改报价并发送，周五再确认');
+  const r3 = mkR(c2.id, o3.id, '微信', -3, 0, '发送投标方案初稿和样品参数。', '客户反馈需要补充检测报告。', '补齐检测报告后跟进');
+  const r4 = mkR(c3.id, o4.id, '上门拜访', -8, 0, '项目验收沟通，现场确认灯具安装效果。', '验收通过，对效果满意。', '7 天后回访维护');
+  const r5 = mkR(c3.id, o4.id, '电话沟通', -5, 0, '确认合同盖章与付款节点。', '财务本周付款。', '跟进回款');
+  db.customers.push(c1, c2, c3);
+  db.opps.push(o1, o2, o3, o4);
+  db.records.push(r1, r2, r3, r4, r5);
+  db.records.forEach(r => { if(r.remindAt) syncRecordReminder(r); });
+  [o1, o3].forEach(o => syncStageReminder(o));
+  db.customers.forEach(c => recalcCustomerFollow(c.id));
+  const ok = save({snapshot: true, reason: 'demo'});
+  invalidateAll();
+  renderAll();
+  toast(ok ? '示例数据已载入' : '示例数据已生成，但保存失败，请导出备份');
+}
+
+/* ==================== 诊断 ==================== */
+async function openDiagnostics(){
+  let estimate = '未知';
+  try{
+    if(navigator.storage && navigator.storage.estimate){
+      const e = await navigator.storage.estimate();
+      estimate = Math.round((e.usage || 0) / 1024) + ' KB / 配额 ' +
+        (e.quota ? (Math.round(e.quota / 1024 / 1024) + ' MB') : '未知');
+    }
+  }catch(e){}
+  const ua = navigator.userAgent || '';
+  const txt =
+    '应用版本：' + APP_VERSION + '（构建 ' + BUILD_LABEL + ' / ' + BUILD_TIME_LABEL + '）\n' +
+    '数据版本：schema v' + SCHEMA_VERSION + '\n' +
+    '访问协议：' + location.protocol + ' // ' + location.host + '\n' +
+    '本地存储：' + (storageOK() ? '可用' : '不可用（无痕/隐私模式？）') + '\n' +
+    '保存状态：' + (runtime.saveError ? ('失败：' + runtime.saveError) : (runtime.lastSavedAt ? '正常' : '尚未写入')) + '\n' +
+    '文字数据占用：' + storageUsageKB() + ' KB\n' +
+    '照片存储：' + (photoMode === 'idb' ? ('IndexedDB，' + photoCount() + ' 张') : '不可用') + '\n' +
+    '浏览器估算占用：' + estimate + '\n' +
+    '数据量：客户 ' + db.customers.length + ' · 商机 ' + db.opps.length +
+    ' · 跟进 ' + db.records.length + ' · 提醒 ' + db.reminders.length + '\n' +
+    'Service Worker：' + (runtime.swStatus === 'ready' ? '已控制' : '未控制') + '\n' +
+    '通知权限：' + (notificationSupported() ? Notification.permission : '不支持') + '\n' +
+    '屏幕：' + (window.screen ? window.screen.width + '×' + window.screen.height : '') + '\n' +
+    '浏览器：' + ua;
+  openModal(
+    '<div class="modal-head">诊断信息</div>' +
+    '<pre class="diag-pre">' + esc(txt) + '</pre>' +
+    '<div class="form-btns">' +
+      '<button type="button" class="btn" id="diagCopy">复制</button>' +
+      '<button type="button" class="btn ghost" data-close>关闭</button></div>'
+  );
+  $('#diagCopy').onclick = async () => {
+    try{
+      if(navigator.clipboard && navigator.clipboard.writeText){
+        await navigator.clipboard.writeText(txt);
+      }else{
+        const ta = document.createElement('textarea');
+        ta.value = txt; document.body.appendChild(ta); ta.select();
+        document.execCommand('copy'); ta.remove();
+      }
+      toast('已复制诊断信息');
+    }catch(e){ toast('复制失败，请手动选择文本'); }
+  };
+}
+
+/* ==================== 看板拖拽 ==================== */
+let drag = null;
+function startDrag(oppId, e){
+  if(e.pointerType === 'mouse' && e.button !== 0) return;
+  const card = e.target.closest('.kanban-card');
+  if(!card) return;
+  e.preventDefault();
+  const rect = card.getBoundingClientRect();
+  const ghost = card.cloneNode(true);
+  ghost.classList.add('ghost');
+  ghost.style.width = rect.width + 'px';
+  ghost.style.left = rect.left + 'px';
+  ghost.style.top = rect.top + 'px';
+  document.body.appendChild(ghost);
+  card.classList.add('dragging-src');
+  drag = {
+    oppId: oppId, ghost: ghost, src: card,
+    offX: e.clientX - rect.left, offY: e.clientY - rect.top,
+    moved: false
+  };
+  document.addEventListener('pointermove', onDragMove, {passive:false});
+  document.addEventListener('pointerup', onDragEnd);
+  document.addEventListener('pointercancel', onDragEnd);
+  document.body.classList.add('dragging');
+}
+function onDragMove(e){
+  if(!drag) return;
+  e.preventDefault();
+  const dx = e.clientX - (parseFloat(drag.ghost.style.left) + drag.offX);
+  const dy = e.clientY - (parseFloat(drag.ghost.style.top) + drag.offY);
+  if(Math.abs(dx) > 3 || Math.abs(dy) > 3) drag.moved = true;
+  drag.ghost.style.left = (e.clientX - drag.offX) + 'px';
+  drag.ghost.style.top = (e.clientY - drag.offY) + 'px';
+  $$('.kanban-col').forEach(c => c.classList.remove('over'));
+  const el = document.elementFromPoint(e.clientX, e.clientY);
+  const col = el ? el.closest('.kanban-col') : null;
+  if(col) col.classList.add('over');
+}
+function onDragEnd(e){
+  if(!drag) return;
+  const d = drag;
+  drag = null;
+  document.removeEventListener('pointermove', onDragMove);
+  document.removeEventListener('pointerup', onDragEnd);
+  document.removeEventListener('pointercancel', onDragEnd);
+  document.body.classList.remove('dragging');
+  if(d.ghost && d.ghost.parentNode) d.ghost.parentNode.removeChild(d.ghost);
+  if(d.src) d.src.classList.remove('dragging-src');
+  $$('.kanban-col').forEach(c => c.classList.remove('over'));
+  if(!d.moved){ openStagePicker(d.oppId); return; }
+  const el = document.elementFromPoint(e.clientX, e.clientY);
+  const col = el ? el.closest('.kanban-col') : null;
+  if(col && col.dataset.stage) setOppStage(d.oppId, col.dataset.stage);
+}
+
+/* ==================== 事件绑定 ==================== */
+function bindEvents(){
+  $$('.tab').forEach(b => b.addEventListener('click', () => showPage(b.dataset.page)));
+
+  $('#fab').addEventListener('click', () => {
+    if(state.page === 'home') openFabMenu();
+    else if(state.page === 'customers') openCustomerForm();
+    else if(state.page === 'opps') openOppForm();
+    else openRecordForm();
+  });
+
+  $('#backdrop').addEventListener('click', closeSheet);
+  $('#modalBackdrop').addEventListener('click', () => closeModal());
+  $('#modalBox').addEventListener('click', e => { if(e.target.closest('[data-close]')) closeModal(); });
+  $('#sheetBody').addEventListener('click', e => {
+    if(e.target.closest('[data-close-sheet]')){ closeSheet(); return; }
+    const eo = e.target.closest('[data-edit-opp]');
+    if(eo){ closeSheet(); openOppForm(oppById(eo.dataset.editOpp)); return; }
+    const er = e.target.closest('[data-edit-rec]');
+    if(er){ closeSheet(); openRecordForm(db.records.find(x => x.id === er.dataset.editRec)); return; }
+  });
+  $('#sheet').addEventListener('click', e => {
+    if(e.target.closest('[data-close-sheet]')) closeSheet();
+  });
+  document.addEventListener('click', e => {
+    if(e.target.closest('[data-close-sheet]')) closeSheet();
+  });
+
+  const doCustSearch = debounce(() => { if(state.page === 'customers') renderCustomers(); }, 180);
+  const doOppSearch = debounce(() => { if(state.page === 'opps') renderOpps(); }, 180);
+  const doRecSearch = debounce(() => { if(state.page === 'records') renderRecords(); }, 180);
+  $('#custQuery').addEventListener('input', e => { state.custQuery = e.target.value; doCustSearch(); });
+  $('#oppQuery').addEventListener('input', e => { state.oppQuery = e.target.value; doOppSearch(); });
+  $('#recQuery').addEventListener('input', e => { state.recQuery = e.target.value; doRecSearch(); });
+
+  $('#custViewBar').addEventListener('click', e => {
+    const b = e.target.closest('[data-view]');
+    if(!b) return;
+    state.custView = b.dataset.view;
+    persistUISettings();
+    renderCustomers();
+  });
+  $('#oppViewBar').addEventListener('click', e => {
+    const b = e.target.closest('[data-view]');
+    if(!b) return;
+    state.oppView = b.dataset.view;
+    persistUISettings();
+    renderOpps();
+  });
+  $('#recViewBar').addEventListener('click', e => {
+    const b = e.target.closest('[data-view]');
+    if(!b) return;
+    state.recView = b.dataset.view;
+    persistUISettings();
+    renderRecords();
+  });
+  $('#oppStageChips').addEventListener('click', e => {
+    const b = e.target.closest('[data-stage]');
+    if(b){ state.oppStage = b.dataset.stage; renderOpps(); }
+  });
+  $('#recTypeChips').addEventListener('click', e => {
+    const b = e.target.closest('[data-type]');
+    if(b){ state.recType = b.dataset.type; renderRecords(); }
+  });
+
+  $('#page-home').addEventListener('click', e => {
+    const qa = e.target.closest('[data-qa]');
+    if(qa){
+      if(qa.dataset.qa === 'customer') openCustomerForm();
+      else if(qa.dataset.qa === 'opp') openOppForm();
+      else openRecordForm();
+      return;
+    }
+    const gt = e.target.closest('[data-goto-table]');
+    if(gt){
+      const page = gt.dataset.gotoTable;
+      if(page === 'customers') state.custView = 'table';
+      if(page === 'opps'){ state.oppView = 'table'; state.oppStage = 'all'; }
+      if(page === 'records') state.recView = 'table';
+      dirtyPages.add(page);
+      showPage(page);
+      return;
+    }
+    if(e.target.closest('[data-open-reminders]')){ openReminders(); return; }
+    if(e.target.closest('[data-goto-records]')){ showPage('records'); return; }
+    const rd = e.target.closest('[data-rem-done]');
+    if(rd){ completeReminder(rd.dataset.remDone); return; }
+    const rg = e.target.closest('[data-rem-goto]');
+    if(rg){
+      if(rg.dataset.remGoto && custById(rg.dataset.remGoto)) openCustomer(rg.dataset.remGoto);
+      else { toast('关联客户已删除，可直接新建跟进记录'); openRecordForm(); }
+      return;
+    }
+    const fr = e.target.closest('[data-open-rec]');
+    if(fr){ openRecordForm(db.records.find(x => x.id === fr.dataset.openRec)); return; }
+  });
+
+  $('#custList').addEventListener('click', e => {
+    const it = e.target.closest('[data-open]');
+    if(it) openCustomer(it.dataset.open);
+  });
+  $('#custList').addEventListener('keydown', e => {
+    if(e.key !== 'Enter' && e.key !== ' ') return;
+    const it = e.target.closest('[data-open]');
+    if(it){ e.preventDefault(); openCustomer(it.dataset.open); }
+  });
+
+  const oppBox = $('#page-opps');
+  oppBox.addEventListener('pointerdown', e => {
+    const grip = e.target.closest('[data-drag]');
+    if(grip) startDrag(grip.dataset.drag, e);
+  });
+  oppBox.addEventListener('click', e => {
+    if(e.target.closest('.drag-grip')) return;
+    const p = e.target.closest('[data-prev]');
+    if(p){ setOppStage(p.dataset.prev, prevStageId(p.dataset.prev)); return; }
+    const n = e.target.closest('[data-next]');
+    if(n){ setOppStage(n.dataset.next, nextStageId(n.dataset.next)); return; }
+    const it = e.target.closest('[data-opp]');
+    if(it) openOppForm(oppById(it.dataset.opp));
+  });
+  oppBox.addEventListener('keydown', e => {
+    if(e.key !== 'Enter' && e.key !== ' ') return;
+    const it = e.target.closest('[data-opp]');
+    if(it && !e.target.closest('button')){ e.preventDefault(); openOppForm(oppById(it.dataset.opp)); }
+  });
+
+  $('#recList').addEventListener('click', e => {
+    const more = e.target.closest('[data-img-more]');
+    if(more){ openImageView(more.dataset.imgMore, 4); return; }
+    const img = e.target.closest('[data-img]');
+    if(img){
+      const parts = img.dataset.img.split('|');
+      openImageView(parts[0], Number(parts[1]));
+      return;
+    }
+    const it = e.target.closest('[data-rec]');
+    if(it) openRecordForm(db.records.find(x => x.id === it.dataset.rec));
+  });
+  $('#recList').addEventListener('keydown', e => {
+    if(e.key !== 'Enter' && e.key !== ' ') return;
+    const it = e.target.closest('[data-rec]');
+    if(it && !e.target.closest('button')){ e.preventDefault(); openRecordForm(db.records.find(x => x.id === it.dataset.rec)); }
+  });
+
+  $('#moreBody').addEventListener('click', e => {
+    const act = e.target.closest('[data-act]');
+    if(!act) return;
+    const a = act.dataset.act;
+    if(a === 'export') exportJSON();
+    else if(a === 'import') $('#importInput').click();
+    else if(a === 'snapshots') openSnapshots();
+    else if(a === 'ics') exportICS();
+    else if(a === 'notify') requestNotifications().then(() => { if(state.page === 'more') renderMore(); });
+    else if(a === 'csv-c') exportCSV('customers');
+    else if(a === 'csv-o') exportCSV('opps');
+    else if(a === 'csv-r') exportCSV('records');
+    else if(a === 'members') openMemberSettings();
+    else if(a === 'diag') openDiagnostics();
+    else if(a === 'demo'){
+      confirmDlg({
+        title: '载入示例数据',
+        msg: '将添加 3 个示例客户、4 个商机、5 条跟进记录（不覆盖现有数据）。继续？',
+        okText: '载入',
+        onOk: seedDemo
+      });
+    }
+    else if(a === 'clear') clearAllData();
+  });
+  $('#moreBody').addEventListener('toggle', e => {
+    const d = e.target.closest('details[data-help]');
+    if(d) state.helpOpen[d.dataset.help] = d.open;
+  }, true);
+
+  $('#globalBanner').addEventListener('click', e => {
+    const b = e.target.closest('[data-banner]');
+    if(!b) return;
+    if(b.dataset.banner === 'export') exportJSON();
+    else if(b.dataset.banner === 'retry'){ save(); toast(runtime.saveError ? '仍然保存失败' : '已重新保存成功'); }
+    else if(b.dataset.banner === 'corrupt') openCorruptDialog();
+  });
+
+  $('#importInput').addEventListener('change', e => {
+    const f = e.target.files && e.target.files[0];
+    e.target.value = '';
+    importBackup(f);
+  });
+
+  document.addEventListener('keydown', e => {
+    handleModalKeydown(e);
+    viewerKey(e);
+    if(e.key === 'Escape' && !runtime.modalOpen && !$('#sheet').hidden) closeSheet();
+  });
+
+  window.addEventListener('hashchange', () => {
+    const p = (location.hash || '').replace(/^#\//, '');
+    if(p && p !== state.page && $('#page-' + p)) showPage(p);
+  });
+
+  window.addEventListener('beforeunload', e => {
+    if(runtime.unsaved || runtime.saveError){
+      e.preventDefault();
+      e.returnValue = '';
+      return '';
+    }
+  });
+
+  document.addEventListener('visibilitychange', () => {
+    if(document.visibilityState === 'visible') checkDueNotifications();
+  });
+  setInterval(checkDueNotifications, 60000);
+}
+
+/* ==================== Service Worker / PWA ==================== */
+function ensureManifest(){
+  if(!location.protocol.startsWith('http')) return;
+  if(document.querySelector('link[rel="manifest"]')) return;
+  const link = document.createElement('link');
+  link.rel = 'manifest';
+  link.href = 'manifest.webmanifest';
+  document.head.appendChild(link);
+}
+function registerSW(){
+  if(!('serviceWorker' in navigator)) return;
+  if(!location.protocol.startsWith('http')) return;
+  navigator.serviceWorker.register('sw.js').then(() => {
+    runtime.swStatus = 'ready';
+    if(state.page === 'more') renderMore();
+  }).catch(() => {
+    runtime.swStatus = 'none';
+    if(state.page === 'more') renderMore();
+  });
+}
+
+/* ==================== 启动 ==================== */
+async function boot(){
+  bindErrorBar();
+  try{
+    initDB();
+  }catch(e){
+    corruptInfo = {raw: '', key: '', error: e && e.message ? e.message : String(e)};
+    db = emptyDB();
+  }
+  await initPhotoStore();
+  bindEvents();
+  const initPage = (location.hash || '').replace(/^#\//, '');
+  showPage(initPage && $('#page-' + initPage) ? initPage : 'home');
+  renderSaveState();
+  renderGlobal();
+
+  if(legacySourceKey && !photoMigrationFailed) save({silent: true});
+  else if(legacySourceKey && photoMigrationFailed){
+    toast('旧版数据已载入，但部分照片写入失败；旧数据暂时保留，请先导出备份');
+  }
+  if(corruptInfo) setTimeout(openCorruptDialog, 400);
+  ensureManifest();
+  registerSW();
+  if(!/[?&]test=1(?:&|$)/.test(location.search)) setTimeout(checkDueNotifications, 1200);
+
+  if(/[?&]test=1(?:&|$)/.test(location.search)){
+    window.__CRM__ = {
+      get db(){ return db; },
+      set db(v){ db = v; },
+      get photoCache(){ return photoCache; },
+      get photoMode(){ return photoMode; },
+      set photoMode(v){ photoMode = v; },
+      get swStatus(){ return runtime.swStatus; },
+      get corruptInfo(){ return corruptInfo; },
+      emptyDB: emptyDB,
+      normalizeDB: normalizeDB,
+      seedDemo: seedDemo,
+      renderAll: renderAll,
+      showPage: showPage,
+      openCustomerForm: openCustomerForm,
+      openOppForm: openOppForm,
+      openRecordForm: openRecordForm,
+      openCustomer: openCustomer,
+      getStats: getStats,
+      save: save,
+      syncRecordReminder: syncRecordReminder,
+      syncStageReminder: syncStageReminder,
+      recalcCustomerFollow: recalcCustomerFollow,
+      persistPhoto: persistPhoto,
+      safeDataUrl: safeDataUrl,
+      csvCell: csvCell,
+      setOppStage: setOppStage,
+      memberOptions: memberOptions,
+      deleteCustomer: deleteCustomer,
+      closeModal: closeModal,
+      state: state
+    };
+  }
+}
+
+document.addEventListener('DOMContentLoaded', function(){
+  boot().catch(err => {
+    showFatal(err && err.message ? err.message : String(err));
+  });
+});
+
+
+
+
+</script>
 </body>
 </html>
